@@ -201,29 +201,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     request?: any
   ) => {
     try {
-      const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
-
-      const bodyParams: any = {
-        grant_type: "authorization_code",
-        client_id: KEYCLOAK_CONFIG.clientId,
+      // Use your Node.js backend server for token exchange
+      const exchangePayload: any = {
         code,
-        redirect_uri: redirectUri,
+        redirectUri,
       };
 
       // Add code_verifier for PKCE if available (React Native)
       if (request?.codeVerifier) {
-        bodyParams.code_verifier = request.codeVerifier;
+        exchangePayload.code_verifier = request.codeVerifier;
       }
 
-      const body = new URLSearchParams(bodyParams);
-
-      const response = await fetch(tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: body.toString(),
-      });
+      const response = await fetch(
+        `${KEYCLOAK_CONFIG.authServerUrl}/auth/exchange`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(exchangePayload),
+        }
+      );
 
       if (response.ok) {
         const tokens = await response.json();
@@ -235,7 +233,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(userInfo);
         }
       } else {
-        throw new Error("Failed to exchange code for tokens");
+        const errorData = await response.json();
+        console.error("Token exchange failed:", errorData);
+        throw new Error(
+          errorData.error || "Failed to exchange code for tokens"
+        );
       }
     } catch (error) {
       console.error("Token exchange error:", error);
@@ -250,21 +252,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error("No refresh token available");
       }
 
-      const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
-
-      const body = new URLSearchParams({
-        grant_type: "refresh_token",
-        client_id: KEYCLOAK_CONFIG.clientId,
-        refresh_token: refreshTokenValue,
-      });
-
-      const response = await fetch(tokenUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: body.toString(),
-      });
+      const response = await fetch(
+        `${KEYCLOAK_CONFIG.authServerUrl}/auth/refresh`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            refresh_token: refreshTokenValue,
+          }),
+        }
+      );
 
       if (response.ok) {
         const tokens = await response.json();
@@ -276,7 +275,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUser(userInfo);
         }
       } else {
-        throw new Error("Failed to refresh token");
+        const errorData = await response.json();
+        console.error("Token refresh failed:", errorData);
+        throw new Error(errorData.error || "Failed to refresh token");
       }
     } catch (error) {
       console.error("Token refresh error:", error);
@@ -288,24 +289,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       const accessToken = await StorageUtils.getItem("access_token");
+      const refreshTokenValue = await StorageUtils.getItem("refresh_token");
 
-      if (accessToken) {
-        // Call Keycloak logout endpoint
-        const logoutUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/logout`;
-
-        await fetch(logoutUrl, {
+      if (accessToken || refreshTokenValue) {
+        // Call your backend logout endpoint
+        await fetch(`${KEYCLOAK_CONFIG.authServerUrl}/auth/logout`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
           },
-          body: new URLSearchParams({
-            client_id: KEYCLOAK_CONFIG.clientId,
+          body: JSON.stringify({
+            access_token: accessToken,
+            refresh_token: refreshTokenValue,
           }),
         });
       }
     } catch (error) {
       console.error("Logout error:", error);
+      // Continue with local cleanup even if server logout fails
     } finally {
       await clearStoredAuth();
       setUser(null);
