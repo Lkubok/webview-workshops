@@ -1,15 +1,17 @@
 import { Platform } from "react-native";
+import Constants from "expo-constants";
 
 // Keycloak configuration - determine URLs based on platform and build type
 const getKeycloakConfig = () => {
-  // For iOS Simulator in development, use localhost
-  if (Platform.OS === "ios" && __DEV__) {
+  // For iOS (both Simulator and Device)
+  if (Platform.OS === "ios") {
+    const hostIP = Constants.isDevice ? "192.168.233.174" : "192.168.233.174";
     return {
-      baseUrl: "http://localhost:8080",
+      baseUrl: `http://${hostIP}:8080`,
       realm: "WorkshopRealm",
       clientId: "client-app",
-      redirectUri: "exp://localhost:8081", // Development uses exp:// scheme
-      authServerUrl: "http://localhost:4000",
+      redirectUri: "com.anonymous.clientapp://auth-callback", // Always use native scheme for expo-prebuild
+      authServerUrl: `http://${hostIP}:4000`,
     };
   }
 
@@ -19,23 +21,23 @@ const getKeycloakConfig = () => {
       baseUrl: "http://10.0.2.2:8080",
       realm: "WorkshopRealm",
       clientId: "client-app",
-      redirectUri: "exp://10.0.2.2:8081", // Development uses exp:// scheme
+      redirectUri: "com.anonymous.clientapp://auth-callback", // Always use native scheme for expo-prebuild
       authServerUrl: "http://10.0.2.2:4000",
     };
   }
 
-  // For production builds (both iOS and Android)
-  if (!__DEV__ && Platform.OS !== "web") {
+  // For Android production
+  if (Platform.OS === "android") {
     return {
-      baseUrl: "http://192.168.233.174:8080", // Your production Keycloak URL
+      baseUrl: "http://192.168.233.174:8080",
       realm: "WorkshopRealm",
       clientId: "client-app",
-      redirectUri: "com.anonymous.clientapp://", // Production uses native app scheme
-      authServerUrl: "http://192.168.233.174:4000", // Your production auth server URL
+      redirectUri: "com.anonymous.clientapp://auth-callback",
+      authServerUrl: "http://192.168.233.174:4000",
     };
   }
 
-  // For web or fallback, use the actual IP
+  // For web or fallback
   return {
     baseUrl: "http://192.168.233.174:8080",
     realm: "WorkshopRealm",
