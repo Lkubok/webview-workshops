@@ -24,6 +24,8 @@ interface AuthContextType {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
+  accessToken: string | null; // 👈 added
+  refreshTokenValue: string | null; // 👈 optional
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,6 +39,10 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
+    null
+  );
 
   const getUserInfo = useCallback(
     async (token: string): Promise<User | null> => {
@@ -59,10 +65,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await StorageUtils.setItem("access_token", tokens.access_token);
     if (tokens.refresh_token)
       await StorageUtils.setItem("refresh_token", tokens.refresh_token);
+    console.log("tokens", tokens);
     if (tokens.expires_in) {
       const expiry = Date.now() + tokens.expires_in * 1000;
       await StorageUtils.setItem("token_expiry", expiry.toString());
     }
+
+    // 👇 update state
+    setAccessToken(tokens.access_token);
+    setRefreshTokenValue(tokens.refresh_token ?? null);
   }, []);
 
   const clearStoredAuth = useCallback(async () => {
@@ -213,10 +224,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     (async () => {
       setIsLoading(true);
       try {
-        const accessToken = await StorageUtils.getItem("access_token");
-        const refreshTokenValue = await StorageUtils.getItem("refresh_token");
-        if (accessToken && refreshTokenValue) {
-          const userInfo = await getUserInfo(accessToken);
+        const access = await StorageUtils.getItem("access_token");
+        const refresh = await StorageUtils.getItem("refresh_token");
+        setAccessToken(access);
+        setRefreshTokenValue(refresh);
+
+        if (access && refresh) {
+          const userInfo = await getUserInfo(access);
           if (userInfo) {
             setUser(userInfo);
           } else {
@@ -235,7 +249,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, isLoading, login, logout, refreshToken }}
+      value={{
+        user,
+        isLoading,
+        login,
+        logout,
+        refreshToken,
+        accessToken,
+        refreshTokenValue,
+      }}
     >
       {children}
     </AuthContext.Provider>

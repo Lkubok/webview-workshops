@@ -1,35 +1,44 @@
-"use client"
+"use client";
 
-import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function EmbeddedPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
-  const [currentTime, setCurrentTime] = useState<string>("")
+  const { data: session, status } = useSession();
+  // const {} = useAuth
+  console.log("NEXTJS access token");
+  console.log(session?.accessToken);
+  const router = useRouter();
+  // const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
-    if (status === "loading") return // Still loading
+    if (status === "loading") return; // Still loading
     if (!session) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
-  useEffect(() => {
-    // Update time every second for demo purposes
-    const updateTime = () => {
-      setCurrentTime(new Date().toLocaleTimeString())
-    }
+  // useEffect(() => {
+  //   // Update time every second for demo purposes
+  //   const updateTime = () => {
+  //     setCurrentTime(new Date().toLocaleTimeString());
+  //   };
 
-    updateTime()
-    const interval = setInterval(updateTime, 1000)
+  //   updateTime();
+  //   const interval = setInterval(updateTime, 1000);
 
-    return () => clearInterval(interval)
-  }, [])
+  //   return () => clearInterval(interval);
+  // }, []);
 
   if (status === "loading") {
     return (
@@ -39,16 +48,16 @@ export default function EmbeddedPage() {
           <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return null // Will redirect to login
+    return null; // Will redirect to login
   }
 
   const goBack = () => {
-    router.push("/dashboard")
-  }
+    router.push("/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -64,14 +73,19 @@ export default function EmbeddedPage() {
             </Button>
           </div>
           <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
-          <p className="text-muted-foreground text-sm">Optimized for React Native WebView display</p>
+          <p className="text-muted-foreground text-sm">
+            Optimized for React Native WebView display
+          </p>
         </div>
 
         {/* Main Content Card */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Workshop Content</CardTitle>
-            <CardDescription>This page is designed to be embedded in a React Native WebView component</CardDescription>
+            <CardDescription>
+              This page is designed to be embedded in a React Native WebView
+              component
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* User Info */}
@@ -82,20 +96,10 @@ export default function EmbeddedPage() {
                   <strong>Name:</strong> {session.user?.name || "Not provided"}
                 </p>
                 <p>
-                  <strong>Email:</strong> {session.user?.email || "Not provided"}
+                  <strong>Email:</strong>{" "}
+                  {session.user?.email || "Not provided"}
                 </p>
               </div>
-            </div>
-
-            {/* Live Data Demo */}
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">Live Data</h3>
-              <p className="text-sm">
-                <strong>Current Time:</strong> {currentTime}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Updates every second to demonstrate real-time content
-              </p>
             </div>
 
             {/* WebView Features */}
@@ -111,7 +115,12 @@ export default function EmbeddedPage() {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              <Button onClick={() => window.location.reload()} variant="outline" size="sm" className="flex-1">
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
                 Refresh Content
               </Button>
               <Button onClick={goBack} size="sm" className="flex-1">
@@ -124,10 +133,11 @@ export default function EmbeddedPage() {
         {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            This page is protected by Keycloak authentication and ready for WebView embedding
+            This page is protected by Keycloak authentication and ready for
+            WebView embedding
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

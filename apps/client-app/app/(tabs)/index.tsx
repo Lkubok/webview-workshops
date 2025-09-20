@@ -9,7 +9,9 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 
 export default function HomeScreen() {
-  const { user, refreshToken } = useAuth();
+  const { user, refreshToken, accessToken } = useAuth();
+
+  console.log("Access Token in HomeScreen: ", accessToken);
 
   const handleRefreshToken = async () => {
     try {
