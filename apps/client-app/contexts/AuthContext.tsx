@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { router } from "expo-router";
 import { Platform } from "react-native";
+import Constants from "expo-constants";
 import StorageUtils from "./StorageUtils";
 import { performCompleteLogout } from "./keycloakUtils";
 import { KEYCLOAK_CONFIG } from "./authConfig";
@@ -49,6 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     console.log("AuthProvider initialized with config:", {
       platform: Platform.OS,
       isDev: __DEV__,
+      isDevice: Constants.isDevice,
+      isIOSSimulator: Platform.OS === "ios" && !Constants.isDevice,
       baseUrl: KEYCLOAK_CONFIG.baseUrl,
       authServerUrl: KEYCLOAK_CONFIG.authServerUrl,
       realm: KEYCLOAK_CONFIG.realm,
@@ -203,24 +206,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       );
       type AuthRequestConfig = import("expo-auth-session").AuthRequestConfig;
 
-      // Determine redirect URI based on build type
-      let redirectUri: string;
-
-      if (__DEV__) {
-        // Development build - use exp:// scheme
-        redirectUri = makeRedirectUri({
-          scheme: "exp",
-          path: "/auth-callback",
-        });
-      } else {
-        // Production build - use native app scheme
-        redirectUri = makeRedirectUri({
-          scheme: "com.anonymous.clientapp",
-          path: "/auth-callback",
-        });
-      }
+      // For expo-prebuild, always use the native app scheme
+      const redirectUri = makeRedirectUri({
+        native: "com.anonymous.clientapp://auth-callback",
+        scheme: "com.anonymous.clientapp",
+      });
 
       console.log("Using redirect URI:", redirectUri);
+      console.log(
+        "Configured redirect URI from config:",
+        KEYCLOAK_CONFIG.redirectUri
+      );
 
       const config: AuthRequestConfig = {
         clientId: KEYCLOAK_CONFIG.clientId,
@@ -235,24 +231,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const authUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/auth`;
       console.log("Auth URL:", authUrl);
+      console.log("Full auth config:", {
+        authUrl,
+        clientId: config.clientId,
+        redirectUri: config.redirectUri,
+        scopes: config.scopes,
+        responseType: config.responseType,
+      });
 
       const result = await request.promptAsync({
         authorizationEndpoint: authUrl,
+        // Don't specify tokenEndpoint since we're handling token exchange on our backend
       });
 
       console.log("Auth result:", { type: result.type, params: result.params });
 
       if (result.type === "success" && result.params.code) {
+        console.log("Authentication successful, exchanging code for tokens...");
         await exchangeCodeForTokens(result.params.code, redirectUri, request);
       } else if (result.type === "error") {
+        console.error("Auth error details:", result.params);
         throw new Error(
           result.params?.error_description ||
             result.params?.error ||
             "Authentication failed"
         );
       } else if (result.type === "cancel") {
-        throw new Error("Authentication was cancelled");
+        console.log("Authentication was cancelled by user or redirect failed");
+        // Check if this might be a redirect issue rather than user cancellation
+        throw new Error(
+          "Authentication was cancelled. This might be due to redirect URI configuration. Please check that 'com.anonymous.clientapp://auth-callback' is added to your Keycloak client's Valid Redirect URIs."
+        );
       } else {
+        console.error("Unexpected auth result:", result);
         throw new Error(`Unexpected auth result type: ${result.type}`);
       }
     } catch (e) {
