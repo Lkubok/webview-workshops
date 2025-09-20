@@ -121,6 +121,7 @@ const KEYCLOAK_CONFIG = {
   realm: "WorkshopRealm", // Replace with your realm
   clientId: "client-app", // Your client ID
   redirectUri: "exp://192.168.233.174:8081", // Expo development server
+  authServerUrl: "http://192.168.233.174:4000",
 };
 
 interface User {
@@ -151,6 +152,17 @@ export function useAuth() {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Log configuration on startup
+  useEffect(() => {
+    console.log("AuthProvider initialized with config:", {
+      platform: Platform.OS,
+      isDev: __DEV__,
+      baseUrl: KEYCLOAK_CONFIG.baseUrl,
+      authServerUrl: KEYCLOAK_CONFIG.authServerUrl,
+      realm: KEYCLOAK_CONFIG.realm,
+    });
+  }, []);
 
   useEffect(() => {
     loadStoredAuth();
