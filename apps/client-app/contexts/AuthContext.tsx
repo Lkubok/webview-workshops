@@ -1,11 +1,61 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
+import { Platform } from "react-native";
 
-// Keycloak configuration
+// Storage utility functions that work across platforms
+const StorageUtils = {
+  async getItem(key: string): Promise<string | null> {
+    if (Platform.OS === "web") {
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    } else {
+      try {
+        return await SecureStore.getItemAsync(key);
+      } catch {
+        return null;
+      }
+    }
+  },
+
+  async setItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === "web") {
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        console.warn("Failed to store item in localStorage:", error);
+      }
+    } else {
+      try {
+        await SecureStore.setItemAsync(key, value);
+      } catch (error) {
+        console.warn("Failed to store item in SecureStore:", error);
+      }
+    }
+  },
+
+  async deleteItem(key: string): Promise<void> {
+    if (Platform.OS === "web") {
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        console.warn("Failed to remove item from localStorage:", error);
+      }
+    } else {
+      try {
+        await SecureStore.deleteItemAsync(key);
+      } catch (error) {
+        console.warn("Failed to remove item from SecureStore:", error);
+      }
+    }
+  },
+};
 const KEYCLOAK_CONFIG = {
   baseUrl: "http://192.168.233.174:8080",
-  realm: "your-realm-name", // Replace with your realm
+  realm: "WorkshopRealm", // Replace with your realm
   clientId: "client-app", // Your client ID
   redirectUri: "exp://192.168.233.174:8081", // Expo development server
 };
@@ -45,8 +95,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const loadStoredAuth = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync("access_token");
-      const refreshTokenValue = await SecureStore.getItemAsync("refresh_token");
+      const accessToken = await StorageUtils.getItem("access_token");
+      const refreshTokenValue = await StorageUtils.getItem("refresh_token");
 
       if (accessToken && refreshTokenValue) {
         // Validate token and get user info
@@ -89,11 +139,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async () => {
     try {
-      // For React Native, we'll use the Authorization Code flow with PKCE
+      // Check if we're on web platform
+      if (Platform.OS === "web") {
+        // For web, redirect to Keycloak login page
+        const state = Math.random().toString(36).substring(7);
+        const authUrl =
+          `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/auth?` +
+          `client_id=${KEYCLOAK_CONFIG.clientId}&` +
+          `redirect_uri=${encodeURIComponent(window.location.origin + "/auth-callback")}&` +
+          `response_type=code&` +
+          `scope=openid profile email&` +
+          `state=${state}`;
+
+        // Store state for validation
+        localStorage.setItem("auth_state", state);
+        window.location.href = authUrl;
+        return;
+      }
+
+      // For React Native, use expo-auth-session
       const { AuthRequest, AuthRequestConfig, makeRedirectUri } = await import(
         "expo-auth-session"
       );
-      const { AuthSession } = await import("expo-auth-session");
 
       const redirectUri = makeRedirectUri({
         scheme: "exp",
@@ -131,18 +198,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const exchangeCodeForTokens = async (
     code: string,
     redirectUri: string,
-    request: any
+    request?: any
   ) => {
     try {
       const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
 
-      const body = new URLSearchParams({
+      const bodyParams: any = {
         grant_type: "authorization_code",
         client_id: KEYCLOAK_CONFIG.clientId,
         code,
         redirect_uri: redirectUri,
-        code_verifier: request.codeVerifier,
-      });
+      };
+
+      // Add code_verifier for PKCE if available (React Native)
+      if (request?.codeVerifier) {
+        bodyParams.code_verifier = request.codeVerifier;
+      }
+
+      const body = new URLSearchParams(bodyParams);
 
       const response = await fetch(tokenUrl, {
         method: "POST",
@@ -172,7 +245,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshToken = async () => {
     try {
-      const refreshTokenValue = await SecureStore.getItemAsync("refresh_token");
+      const refreshTokenValue = await StorageUtils.getItem("refresh_token");
       if (!refreshTokenValue) {
         throw new Error("No refresh token available");
       }
@@ -214,7 +287,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync("access_token");
+      const accessToken = await StorageUtils.getItem("access_token");
 
       if (accessToken) {
         // Call Keycloak logout endpoint
@@ -241,20 +314,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const storeTokens = async (tokens: any) => {
-    await SecureStore.setItemAsync("access_token", tokens.access_token);
+    await StorageUtils.setItem("access_token", tokens.access_token);
     if (tokens.refresh_token) {
-      await SecureStore.setItemAsync("refresh_token", tokens.refresh_token);
+      await StorageUtils.setItem("refresh_token", tokens.refresh_token);
     }
     if (tokens.expires_in) {
       const expiryTime = Date.now() + tokens.expires_in * 1000;
-      await SecureStore.setItemAsync("token_expiry", expiryTime.toString());
+      await StorageUtils.setItem("token_expiry", expiryTime.toString());
     }
   };
 
   const clearStoredAuth = async () => {
-    await SecureStore.deleteItemAsync("access_token");
-    await SecureStore.deleteItemAsync("refresh_token");
-    await SecureStore.deleteItemAsync("token_expiry");
+    await StorageUtils.deleteItem("access_token");
+    await StorageUtils.deleteItem("refresh_token");
+    await StorageUtils.deleteItem("token_expiry");
+    if (Platform.OS === "web") {
+      await StorageUtils.deleteItem("auth_state");
+    }
   };
 
   const value: AuthContextType = {
