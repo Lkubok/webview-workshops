@@ -24,8 +24,8 @@ interface AuthContextType {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<void>;
-  accessToken: string | null; // 👈 added
-  refreshTokenValue: string | null; // 👈 optional
+  accessToken: string | null;
+  refreshTokenValue: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -43,6 +43,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(
     null
   );
+
+  // Log configuration on startup for debugging
+  useEffect(() => {
+    console.log("AuthProvider initialized with config:", {
+      platform: Platform.OS,
+      isDev: __DEV__,
+      baseUrl: KEYCLOAK_CONFIG.baseUrl,
+      authServerUrl: KEYCLOAK_CONFIG.authServerUrl,
+      realm: KEYCLOAK_CONFIG.realm,
+      redirectUri: KEYCLOAK_CONFIG.redirectUri,
+    });
+  }, []);
 
   const getUserInfo = useCallback(
     async (token: string): Promise<User | null> => {
@@ -65,13 +77,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await StorageUtils.setItem("access_token", tokens.access_token);
     if (tokens.refresh_token)
       await StorageUtils.setItem("refresh_token", tokens.refresh_token);
-    console.log("tokens", tokens);
+    console.log("tokens stored successfully");
     if (tokens.expires_in) {
       const expiry = Date.now() + tokens.expires_in * 1000;
       await StorageUtils.setItem("token_expiry", expiry.toString());
     }
 
-    // 👇 update state
+    // Update state
     setAccessToken(tokens.access_token);
     setRefreshTokenValue(tokens.refresh_token ?? null);
   }, []);
@@ -81,6 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await StorageUtils.deleteItem("refresh_token");
     await StorageUtils.deleteItem("token_expiry");
     if (Platform.OS === "web") await StorageUtils.deleteItem("auth_state");
+
+    // Clear state
+    setAccessToken(null);
+    setRefreshTokenValue(null);
   }, []);
 
   const refreshToken = useCallback(async () => {
@@ -115,6 +131,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const payload: any = { code, redirectUri };
         if (request?.codeVerifier) payload.code_verifier = request.codeVerifier;
+
+        console.log("Exchanging code for tokens with payload:", {
+          code: code.substring(0, 10) + "...",
+          redirectUri,
+          hasCodeVerifier: !!request?.codeVerifier,
+        });
+
         const res = await fetch(
           `${KEYCLOAK_CONFIG.authServerUrl}/auth/exchange`,
           {
@@ -123,10 +146,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             body: JSON.stringify(payload),
           }
         );
+
         if (!res.ok) {
           const errData = await res.json();
+          console.error("Token exchange failed:", errData);
           throw new Error(errData.error || "Token exchange failed");
         }
+
         const tokens = await res.json();
         await storeTokens(tokens);
         const userInfo = await getUserInfo(tokens.access_token);
@@ -141,6 +167,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async () => {
     try {
+      // Test network connectivity first for mobile
+      if (Platform.OS !== "web") {
+        console.log("Testing network connectivity...");
+        try {
+          const healthCheck = await fetch(
+            `${KEYCLOAK_CONFIG.authServerUrl}/health`,
+            {
+              method: "GET",
+            }
+          );
+          console.log("Auth server health check:", healthCheck.status);
+        } catch (healthError) {
+          console.error("Health check failed:", healthError);
+          throw new Error(
+            `Cannot reach auth server at ${KEYCLOAK_CONFIG.authServerUrl}. Please check:\n1. Server is running\n2. Device can access the server\n3. No firewall blocking the connection`
+          );
+        }
+      }
+
       if (Platform.OS === "web") {
         const state = Math.random().toString(36).substring(7);
         const authUrl =
@@ -152,41 +197,63 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // For React Native with expo-prebuild
       const { AuthRequest, makeRedirectUri } = await import(
         "expo-auth-session"
       );
-      // Import type for AuthRequestConfig
       type AuthRequestConfig = import("expo-auth-session").AuthRequestConfig;
 
-      const redirectUri = makeRedirectUri({
-        scheme: "exp",
-        path: "/auth-callback",
-      });
+      // Determine redirect URI based on build type
+      let redirectUri: string;
+
+      if (__DEV__) {
+        // Development build - use exp:// scheme
+        redirectUri = makeRedirectUri({
+          scheme: "exp",
+          path: "/auth-callback",
+        });
+      } else {
+        // Production build - use native app scheme
+        redirectUri = makeRedirectUri({
+          scheme: "com.anonymous.clientapp",
+          path: "/auth-callback",
+        });
+      }
+
+      console.log("Using redirect URI:", redirectUri);
 
       const config: AuthRequestConfig = {
         clientId: KEYCLOAK_CONFIG.clientId,
         scopes: ["openid", "profile", "email"],
         redirectUri,
         responseType: "code",
+        additionalParameters: {},
+        extraParams: {},
       };
 
       const request = new AuthRequest(config);
 
       const authUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/auth`;
-      // const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
+      console.log("Auth URL:", authUrl);
 
       const result = await request.promptAsync({
         authorizationEndpoint: authUrl,
       });
 
+      console.log("Auth result:", { type: result.type, params: result.params });
+
       if (result.type === "success" && result.params.code) {
         await exchangeCodeForTokens(result.params.code, redirectUri, request);
-      } else {
+      } else if (result.type === "error") {
         throw new Error(
-          result.type === "error"
-            ? (result.params?.error_description ?? "Authentication failed")
-            : "Authentication cancelled"
+          result.params?.error_description ||
+            result.params?.error ||
+            "Authentication failed"
         );
+      } else if (result.type === "cancel") {
+        throw new Error("Authentication was cancelled");
+      } else {
+        throw new Error(`Unexpected auth result type: ${result.type}`);
       }
     } catch (e) {
       console.error("Login error:", e);
@@ -234,6 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userInfo) {
             setUser(userInfo);
           } else {
+            // Token might be expired, try refresh
             await refreshToken();
           }
         }
