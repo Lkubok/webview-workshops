@@ -293,24 +293,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (accessToken || refreshTokenValue) {
         // Call your backend logout endpoint
-        await fetch(`${KEYCLOAK_CONFIG.authServerUrl}/auth/logout`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            access_token: accessToken,
-            refresh_token: refreshTokenValue,
-          }),
-        });
+        const response = await fetch(
+          `${KEYCLOAK_CONFIG.authServerUrl}/auth/logout`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              access_token: accessToken,
+              refresh_token: refreshTokenValue,
+            }),
+          }
+        );
+
+        const result = await response.json();
+        console.log("Logout response:", result);
       }
     } catch (error) {
       console.error("Logout error:", error);
       // Continue with local cleanup even if server logout fails
     } finally {
+      // Always clear local state
       await clearStoredAuth();
       setUser(null);
-      router.replace("/login");
+
+      // For web, also perform a Keycloak logout redirect to ensure complete logout
+      if (Platform.OS === "web") {
+        const keycloakLogoutUrl =
+          `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/logout?` +
+          `client_id=${KEYCLOAK_CONFIG.clientId}&` +
+          `post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/login")}`;
+
+        // Redirect to Keycloak logout page, which will redirect back to login
+        window.location.href = keycloakLogoutUrl;
+      } else {
+        // For React Native, just navigate to login
+        router.replace("/login");
+      }
     }
   };
 
