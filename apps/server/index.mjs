@@ -10,9 +10,23 @@ app.use(express.json());
 const { KEYCLOAK_ISSUER, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET } =
   process.env;
 
+// Log configuration on startup (without secrets)
+console.log("Server starting with configuration:");
+console.log("KEYCLOAK_ISSUER:", KEYCLOAK_ISSUER);
+console.log("KEYCLOAK_CLIENT_ID:", KEYCLOAK_CLIENT_ID);
+console.log(
+  "KEYCLOAK_CLIENT_SECRET:",
+  KEYCLOAK_CLIENT_SECRET ? "[SET]" : "[NOT SET]"
+);
+
 // Health check endpoint
 app.get("/health", (req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    keycloak_issuer: KEYCLOAK_ISSUER,
+    client_id: KEYCLOAK_CLIENT_ID,
+  });
 });
 
 // Token exchange endpoint (your existing code)

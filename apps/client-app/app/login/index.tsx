@@ -30,6 +30,18 @@ export default function LoginScreen() {
     }
   };
 
+  const testConnection = async () => {
+    try {
+      const response = await fetch("http://192.168.233.174:4000/health");
+      const data = await response.json();
+      alert(`Success: ${JSON.stringify(data)}`);
+    } catch (error) {
+      alert(`Failed: ${error.message}`);
+    }
+  };
+
+  // Add this button in your login screen JSX
+
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -56,6 +68,9 @@ export default function LoginScreen() {
         <Text style={styles.infoText}>
           You will be redirected to Keycloak to sign in securely.
         </Text>
+        <TouchableOpacity onPress={testConnection}>
+          <Text>Test Connection</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

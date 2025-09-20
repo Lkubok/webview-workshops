@@ -3,6 +3,69 @@ import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { Platform } from "react-native";
 
+// Import logout utility (you can create this file or inline the function)
+const performCompleteLogout = async (
+  authServerUrl: string,
+  keycloakConfig: any,
+  tokens: any
+) => {
+  try {
+    // Step 1: Call backend logout
+    const response = await fetch(`${authServerUrl}/auth/logout`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        access_token: tokens.accessToken,
+        refresh_token: tokens.refreshToken,
+      }),
+    });
+
+    const result = await response.json();
+    console.log("Backend logout response:", result);
+
+    // Step 2: For web, clear Keycloak session by calling logout in iframe
+    if (Platform.OS === "web") {
+      await clearKeycloakSession(keycloakConfig);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Logout error:", error);
+    return { success: false, error };
+  }
+};
+
+const clearKeycloakSession = (keycloakConfig: any): Promise<void> => {
+  return new Promise((resolve) => {
+    // Create hidden iframe to call Keycloak logout
+    const iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.src = `${keycloakConfig.baseUrl}/realms/${keycloakConfig.realm}/protocol/openid-connect/logout?client_id=${keycloakConfig.clientId}`;
+
+    iframe.onload = () => {
+      document.body.removeChild(iframe);
+      resolve();
+    };
+
+    iframe.onerror = () => {
+      document.body.removeChild(iframe);
+      resolve(); // Don't fail logout on iframe error
+    };
+
+    document.body.appendChild(iframe);
+
+    // Cleanup after 5 seconds regardless
+    setTimeout(() => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+        resolve();
+      }
+    }, 5000);
+  });
+};
+
 // Storage utility functions that work across platforms
 const StorageUtils = {
   async getItem(key: string): Promise<string | null> {
@@ -157,6 +220,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      // For React Native, first test network connectivity
+      console.log("Testing network connectivity...");
+      try {
+        const healthCheck = await fetch(
+          `${KEYCLOAK_CONFIG.authServerUrl}/health`,
+          {
+            method: "GET",
+            timeout: 10000, // 10 second timeout
+          }
+        );
+        console.log("Health check response:", healthCheck.status);
+      } catch (healthError) {
+        console.error("Health check failed:", healthError);
+        throw new Error(
+          `Cannot reach auth server at ${KEYCLOAK_CONFIG.authServerUrl}. Please check:\n1. Server is running\n2. Device can access ${KEYCLOAK_CONFIG.authServerUrl}\n3. No firewall blocking the connection`
+        );
+      }
+
+      // Test Keycloak connectivity
+      try {
+        const keycloakHealthCheck = await fetch(
+          `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}`,
+          {
+            method: "GET",
+            timeout: 10000,
+          }
+        );
+        console.log(
+          "Keycloak health check response:",
+          keycloakHealthCheck.status
+        );
+      } catch (keycloakError) {
+        console.error("Keycloak health check failed:", keycloakError);
+        throw new Error(
+          `Cannot reach Keycloak at ${KEYCLOAK_CONFIG.baseUrl}. Please check:\n1. Keycloak is running\n2. Device can access ${KEYCLOAK_CONFIG.baseUrl}\n3. Realm 'WorkshopRealm' exists`
+        );
+      }
+
       // For React Native, use expo-auth-session
       const { AuthRequest, AuthRequestConfig, makeRedirectUri } = await import(
         "expo-auth-session"
@@ -166,6 +267,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         scheme: "exp",
         path: "/auth-callback",
       });
+
+      console.log("Using redirect URI:", redirectUri);
 
       const config: AuthRequestConfig = {
         clientId: KEYCLOAK_CONFIG.clientId,
@@ -179,6 +282,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const authUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/auth`;
       const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
 
+      console.log("Auth URL:", authUrl);
+
       const request = new AuthRequest(config);
 
       const result = await request.promptAsync({
@@ -186,8 +291,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         tokenEndpoint: tokenUrl,
       });
 
+      console.log("Auth result:", result);
+
       if (result.type === "success" && result.params.code) {
         await exchangeCodeForTokens(result.params.code, redirectUri, request);
+      } else if (result.type === "error") {
+        throw new Error(
+          `Authentication failed: ${result.params?.error_description || result.params?.error || "Unknown error"}`
+        );
+      } else if (result.type === "cancel") {
+        throw new Error("Authentication was cancelled");
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -291,24 +404,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const accessToken = await StorageUtils.getItem("access_token");
       const refreshTokenValue = await StorageUtils.getItem("refresh_token");
 
+      // Use the complete logout utility
       if (accessToken || refreshTokenValue) {
-        // Call your backend logout endpoint
-        const response = await fetch(
-          `${KEYCLOAK_CONFIG.authServerUrl}/auth/logout`,
+        await performCompleteLogout(
+          KEYCLOAK_CONFIG.authServerUrl,
+          KEYCLOAK_CONFIG,
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              access_token: accessToken,
-              refresh_token: refreshTokenValue,
-            }),
+            accessToken,
+            refreshToken: refreshTokenValue,
           }
         );
-
-        const result = await response.json();
-        console.log("Logout response:", result);
       }
     } catch (error) {
       console.error("Logout error:", error);
@@ -318,18 +423,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await clearStoredAuth();
       setUser(null);
 
-      // For web, also perform a Keycloak logout redirect to ensure complete logout
-      if (Platform.OS === "web") {
-        const keycloakLogoutUrl =
-          `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/logout?` +
-          `client_id=${KEYCLOAK_CONFIG.clientId}&` +
-          `post_logout_redirect_uri=${encodeURIComponent(window.location.origin + "/login")}`;
+      // Navigate to login
+      router.replace("/login");
 
-        // Redirect to Keycloak logout page, which will redirect back to login
-        window.location.href = keycloakLogoutUrl;
-      } else {
-        // For React Native, just navigate to login
-        router.replace("/login");
+      // For web, force a page reload to ensure clean state
+      if (Platform.OS === "web") {
+        setTimeout(() => {
+          window.location.reload();
+        }, 100);
       }
     }
   };
