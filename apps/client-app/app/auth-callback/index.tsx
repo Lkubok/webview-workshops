@@ -66,30 +66,26 @@ export default function AuthCallbackScreen() {
 
   const exchangeCodeForTokens = async (code: string) => {
     const KEYCLOAK_CONFIG = {
-      baseUrl: "http://192.168.233.174:8080",
-      realm: "your-realm-name", // Replace with your realm
-      clientId: "client-app",
+      authServerUrl: "http://192.168.233.174:4000", // Your Node.js auth server
     };
 
-    const tokenUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
-
-    const body = new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: KEYCLOAK_CONFIG.clientId,
-      code,
-      redirect_uri: window.location.origin + "/auth-callback",
-    });
-
-    const response = await fetch(tokenUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: body.toString(),
-    });
+    const response = await fetch(
+      `${KEYCLOAK_CONFIG.authServerUrl}/auth/exchange`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          code,
+          redirectUri: window.location.origin + "/auth-callback",
+        }),
+      }
+    );
 
     if (!response.ok) {
-      throw new Error("Failed to exchange code for tokens");
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to exchange code for tokens");
     }
 
     const tokens = await response.json();
