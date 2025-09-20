@@ -64,6 +64,22 @@ export default function TabLayout() {
           ),
         }}
       />
+      {Platform.OS !== "web" && (
+        <Tabs.Screen
+          name="webview"
+          options={{
+            title: "Dashboard",
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons
+                name={focused ? "desktop" : "desktop-outline"}
+                color={color}
+                size={24}
+              />
+            ),
+            headerTitle: "Device Dashboard",
+          }}
+        />
+      )}
     </Tabs>
   );
 }
