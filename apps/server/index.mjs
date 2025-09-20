@@ -106,7 +106,12 @@ app.post("/auth/logout", async (req, res) => {
 
     // Keycloak logout might return 204 or other success codes
     if (resp.ok || resp.status === 204) {
-      res.json({ success: true, message: "Logged out successfully" });
+      res.json({
+        success: true,
+        message: "Logged out successfully",
+        // Provide logout URL for web clients that want to do full Keycloak logout
+        keycloakLogoutUrl: `${KEYCLOAK_ISSUER}/protocol/openid-connect/logout?client_id=${KEYCLOAK_CLIENT_ID}`,
+      });
     } else {
       const json = await resp.json().catch(() => ({}));
       res.status(500).json({ error: "logout failed", details: json });
@@ -118,6 +123,7 @@ app.post("/auth/logout", async (req, res) => {
       success: true,
       message: "Local logout completed",
       warning: "Server logout may have failed",
+      keycloakLogoutUrl: `${KEYCLOAK_ISSUER}/protocol/openid-connect/logout?client_id=${KEYCLOAK_CLIENT_ID}`,
     });
   }
 });
