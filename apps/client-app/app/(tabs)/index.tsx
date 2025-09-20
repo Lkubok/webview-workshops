@@ -1,31 +1,21 @@
-import { StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, Button } from "react-native";
+import { useAuth } from "../../contexts/AuthContext";
+import { useRouter } from "expo-router";
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+export default function HomeScreen() {
+  const { logout } = useAuth();
+  const router = useRouter();
 
-export default function TabOneScreen() {
+  const handleLogout = () => {
+    logout();
+    router.replace("/login"); // force redirect to login
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Welcome to your app!</Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
