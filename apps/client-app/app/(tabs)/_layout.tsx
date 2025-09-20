@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { TouchableOpacity, Alert } from "react-native";
+import { TouchableOpacity, Alert, Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -8,14 +8,22 @@ export default function TabLayout() {
   const { logout, user } = useAuth();
 
   const handleLogout = () => {
-    Alert.alert("Sign Out", "Are you sure you want to sign out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign Out",
-        style: "destructive",
-        onPress: logout,
-      },
-    ]);
+    if (Platform.OS === "web") {
+      // For web, use native browser confirm dialog
+      if (window.confirm("Are you sure you want to sign out?")) {
+        logout();
+      }
+    } else {
+      // For mobile, use React Native Alert
+      Alert.alert("Sign Out", "Are you sure you want to sign out?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: logout,
+        },
+      ]);
+    }
   };
 
   return (
