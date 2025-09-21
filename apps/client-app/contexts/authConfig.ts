@@ -1,3 +1,4 @@
+//TODO: add web proper auth config
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
