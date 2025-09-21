@@ -66,7 +66,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="webview"
           options={{
-            title: "Dashboard",
+            title: "Embedded",
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 name={focused ? "desktop" : "desktop-outline"}

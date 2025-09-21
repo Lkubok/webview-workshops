@@ -19,7 +19,6 @@ export default function EmbeddedPage() {
   console.log("NEXTJS access token");
   console.log(session?.accessToken);
   const router = useRouter();
-  // const [currentTime, setCurrentTime] = useState<string>("");
 
   useEffect(() => {
     if (status === "loading") return; // Still loading
@@ -27,18 +26,6 @@ export default function EmbeddedPage() {
       router.push("/login");
     }
   }, [session, status, router]);
-
-  // useEffect(() => {
-  //   // Update time every second for demo purposes
-  //   const updateTime = () => {
-  //     setCurrentTime(new Date().toLocaleTimeString());
-  //   };
-
-  //   updateTime();
-  //   const interval = setInterval(updateTime, 1000);
-
-  //   return () => clearInterval(interval);
-  // }, []);
 
   if (status === "loading") {
     return (
