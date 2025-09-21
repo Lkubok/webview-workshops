@@ -1,22 +1,29 @@
-"use client"
+"use client";
 
-import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
+import { useSession, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
+import Link from "next/link";
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    if (status === "loading") return // Still loading
+    if (status === "loading") return; // Still loading
     if (!session) {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [session, status, router])
+  }, [session, status, router]);
 
   if (status === "loading") {
     return (
@@ -26,16 +33,16 @@ export default function DashboardPage() {
           <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!session) {
-    return null // Will redirect to login
+    return null; // Will redirect to login
   }
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: "/login" })
-  }
+    signOut({ callbackUrl: "/login" });
+  };
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -44,11 +51,16 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Workshop Dashboard</h1>
-            <p className="text-muted-foreground mt-1">Welcome back, {session.user?.name || session.user?.email}</p>
+            <p className="text-muted-foreground mt-1">
+              Welcome back, {session.user?.name || session.user?.email}
+            </p>
           </div>
-          <Button onClick={handleSignOut} variant="outline">
-            Sign Out
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button onClick={handleSignOut} variant="outline">
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         {/* Welcome Card */}
@@ -56,8 +68,8 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle>Welcome to the Workshop!</CardTitle>
             <CardDescription>
-              You have successfully authenticated with Keycloak. This dashboard is protected and only visible to
-              authenticated users.
+              You have successfully authenticated with Keycloak. This dashboard
+              is protected and only visible to authenticated users.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -66,10 +78,12 @@ export default function DashboardPage() {
                 <h3 className="font-semibold mb-2">User Information:</h3>
                 <div className="text-sm text-muted-foreground space-y-1">
                   <p>
-                    <strong>Name:</strong> {session.user?.name || "Not provided"}
+                    <strong>Name:</strong>{" "}
+                    {session.user?.name || "Not provided"}
                   </p>
                   <p>
-                    <strong>Email:</strong> {session.user?.email || "Not provided"}
+                    <strong>Email:</strong>{" "}
+                    {session.user?.email || "Not provided"}
                   </p>
                 </div>
               </div>
@@ -77,10 +91,13 @@ export default function DashboardPage() {
               <div className="pt-4 border-t">
                 <h3 className="font-semibold mb-3">Available Actions:</h3>
                 <Link href="/embedded">
-                  <Button className="w-full sm:w-auto">View Embedded Page</Button>
+                  <Button className="w-full sm:w-auto">
+                    View Embedded Page
+                  </Button>
                 </Link>
                 <p className="text-sm text-muted-foreground mt-2">
-                  This page is designed to be displayed inside a React Native WebView
+                  This page is designed to be displayed inside a React Native
+                  WebView
                 </p>
               </div>
             </div>
@@ -88,5 +105,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

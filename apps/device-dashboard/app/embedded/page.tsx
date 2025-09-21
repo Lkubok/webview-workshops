@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
@@ -55,9 +56,12 @@ export default function EmbeddedPage() {
             <Badge variant="secondary" className="text-xs">
               WebView Ready
             </Badge>
-            <Button onClick={goBack} variant="ghost" size="sm">
-              ← Back
-            </Button>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <Button onClick={goBack} variant="ghost" size="sm">
+                ← Back
+              </Button>
+            </div>
           </div>
           <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
           <p className="text-muted-foreground text-sm">
