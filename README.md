@@ -17,6 +17,12 @@ Before you start, make sure you have the following installed on your system:
 Add the following entry to your `/etc/hosts` file for local domain resolution:
 
 ```
+sudo vim /etc/hosts
+```
+
+and then
+
+```
 127.0.0.1 device-dashboard.localhost
 ```
 
