@@ -36,22 +36,22 @@ export default function LoginScreen() {
       const data = await response.json();
       alert(`Success: ${JSON.stringify(data)}`);
     } catch (error) {
-      alert(`Failed: ${error.message}`);
+      if (error instanceof Error) {
+        alert(`Failed: ${error.message}`);
+      } else {
+        alert(`Failed: ${String(error)}`);
+      }
     }
   };
-
-  // Add this button in your login screen JSX
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        {/* App Logo/Title */}
         <View style={styles.header}>
           <Text style={styles.title}>Welcome</Text>
           <Text style={styles.subtitle}>Sign in to continue</Text>
         </View>
 
-        {/* Login Button */}
         <TouchableOpacity
           style={[styles.loginButton, isLogging && styles.loginButtonDisabled]}
           onPress={handleLogin}
@@ -64,7 +64,6 @@ export default function LoginScreen() {
           )}
         </TouchableOpacity>
 
-        {/* Info Text */}
         <Text style={styles.infoText}>
           You will be redirected to Keycloak to sign in securely.
         </Text>

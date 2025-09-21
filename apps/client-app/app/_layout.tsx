@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { AuthProvider, useAuth } from "../contexts/AuthContext";
 
-// Protected route wrapper component
 function RootLayoutNav() {
   const { user, isLoading } = useAuth();
   const segments = useSegments();
@@ -14,10 +13,8 @@ function RootLayoutNav() {
     const inAuthGroup = segments[0] === "(tabs)";
 
     if (!user && inAuthGroup) {
-      // Redirect to login if user is not authenticated and trying to access protected routes
       router.replace("/login");
     } else if (user && !inAuthGroup) {
-      // Redirect to main app if user is authenticated and not in protected routes
       router.replace("/");
     }
   }, [user, segments, isLoading]);
