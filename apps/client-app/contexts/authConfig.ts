@@ -7,7 +7,7 @@ const getKeycloakConfig = () => {
   if (Platform.OS === "ios") {
     const hostIP = Constants.isDevice ? "192.168.233.174" : "192.168.233.174";
     return {
-      baseUrl: `http://${hostIP}:8080`,
+      baseUrl: `http://plague.dev/idm`, // Use your Keycloak server URL
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "com.anonymous.clientapp://auth-callback", // Always use native scheme for expo-prebuild
