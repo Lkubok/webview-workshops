@@ -71,6 +71,7 @@ export default function WebViewScreen() {
         .join("\n");
 
       Alert.alert("Current Cookies", cookieList);
+      console.log("Cookies:", cookies);
     } catch (error) {
       console.error("Error getting cookies:", error);
       Alert.alert("Error", "Failed to retrieve cookies");
@@ -92,17 +93,38 @@ export default function WebViewScreen() {
             }
 
             try {
-              const [name, value] = cookieString.split("=");
+              const [name, ...valueParts] = cookieString.split("=");
+              const value = valueParts.join("="); // Handle values with = in them
 
+              // Method 1: Set cookie via CookieManager
               await CookieManager.set(WEBVIEW_URL, {
                 name: name.trim(),
                 value: value.trim(),
                 domain: "localhost",
                 path: "/",
+                httpOnly: false, // Allow JavaScript access
+                secure: false, // Since using http://
               });
 
-              Alert.alert("Success", "Cookie set successfully");
-              webViewRef.current?.reload();
+              // Method 2: Also inject the cookie via JavaScript
+              const jsCode = `
+                try {
+                  document.cookie = "${name.trim()}=${value.trim()}; path=/; domain=localhost";
+                  console.log('Cookie set via JS:', document.cookie);
+                } catch(e) {
+                  console.error('Error setting cookie via JS:', e);
+                }
+                true;
+              `;
+
+              webViewRef.current?.injectJavaScript(jsCode);
+
+              Alert.alert("Success", "Cookie set successfully. Refreshing...");
+
+              // Reload after a short delay
+              setTimeout(() => {
+                webViewRef.current?.reload();
+              }, 500);
             } catch (error) {
               console.error("Error setting cookie:", error);
               Alert.alert("Error", "Failed to set cookie");
@@ -126,10 +148,24 @@ export default function WebViewScreen() {
           style: "destructive",
           onPress: async () => {
             try {
-              // @ts-ignore
-              await CookieManager.clearByName(WEBVIEW_URL);
+              // Clear via CookieManager
+              await CookieManager.clearAll();
+
+              // Also clear via JavaScript
+              const jsCode = `
+                document.cookie.split(";").forEach(function(c) { 
+                  document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                true;
+              `;
+
+              webViewRef.current?.injectJavaScript(jsCode);
+
+              setTimeout(() => {
+                webViewRef.current?.reload();
+              }, 100);
+
               Alert.alert("Success", "Cookies cleared successfully");
-              webViewRef.current?.reload();
             } catch (error) {
               console.error("Error clearing cookies:", error);
               Alert.alert("Error", "Failed to clear cookies");
@@ -146,35 +182,54 @@ export default function WebViewScreen() {
       { text: "View Cookies", onPress: getCookies },
       { text: "Set Cookie", onPress: setCookie },
       { text: "Clear Cookies", onPress: clearCookies, style: "destructive" },
+      { text: "Sync Cookies", onPress: syncCookies },
       { text: "Cancel", style: "cancel" },
     ]);
   };
 
-  // Inject JavaScript to handle additional functionality
+  // New function to sync cookies from webview to native
+  const syncCookies = useCallback(() => {
+    const jsCode = `
+      window.ReactNativeWebView.postMessage(JSON.stringify({
+        type: 'sync_cookies',
+        cookies: document.cookie
+      }));
+      true;
+    `;
+
+    webViewRef.current?.injectJavaScript(jsCode);
+  }, []);
+
+  // Enhanced injected JavaScript
   const injectedJavaScript = `
     (function() {
-      // Add any custom JavaScript you want to run in the webview
       console.log('WebView loaded successfully');
+      console.log('Current cookies:', document.cookie);
       
-      // You can access cookies via document.cookie
-      // window.ReactNativeWebView.postMessage(JSON.stringify({
-      //   type: 'cookies',
-      //   cookies: document.cookie
-      // }));
+      // Send initial cookies to React Native
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: 'cookies',
+          cookies: document.cookie
+        }));
+      }
     })();
-    true; // Required for iOS
+    true;
   `;
 
-  // Handle messages from webview
+  // Enhanced message handler
   const handleMessage = (event: any) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       console.log("Message from webview:", data);
 
-      // Handle different message types
       switch (data.type) {
         case "cookies":
           console.log("Cookies from webview:", data.cookies);
+          break;
+        case "sync_cookies":
+          console.log("Syncing cookies:", data.cookies);
+          Alert.alert("WebView Cookies", data.cookies || "No cookies found");
           break;
         default:
           console.log("Unknown message type:", data.type);
@@ -259,9 +314,11 @@ export default function WebViewScreen() {
         mediaPlaybackRequiresUserAction={false}
         mixedContentMode="compatibility"
         allowsBackForwardNavigationGestures={true}
-        // Allow cookies
+        // Enhanced cookie settings
         sharedCookiesEnabled={true}
         thirdPartyCookiesEnabled={true}
+        incognito={false} // Ensure cookies are persisted
+        cacheEnabled={true}
         // Additional props for better compatibility
         originWhitelist={["*"]}
         allowFileAccess={true}
