@@ -38,12 +38,16 @@ const getKeycloakConfig = () => {
   }
 
   // For web or fallback
+  const hostIP = Constants.isDevice ? "192.168.233.174" : "192.168.233.174";
+
   return {
-    baseUrl: "http://192.168.233.174:8080",
+    baseUrl: `http://plague.dev/idm`, // Use your Keycloak server URL
     realm: "WorkshopRealm",
     clientId: "client-app",
     redirectUri: "exp://192.168.233.174:8081",
-    authServerUrl: "http://192.168.233.174:4000",
+    // redirectUri: "exp://localhost:8081/auth-callback", // For web, use localhost or your dev machine IP
+    // redirectUri: "http://localhost:8081/auth-callback",
+    authServerUrl: `http://${hostIP}:4000`,
   };
 };
 
