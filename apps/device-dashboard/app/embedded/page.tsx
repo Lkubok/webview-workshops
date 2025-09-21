@@ -12,13 +12,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useHasRole } from "@/hooks/useRole";
 
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
-  // const {} = useAuth
   console.log("NEXTJS access token");
-  console.log(session?.accessToken);
+  const accessToken = (session as typeof session & { accessToken?: string })
+    ?.accessToken;
+  console.log(accessToken);
   const router = useRouter();
+  const hasDashboardRole = useHasRole(
+    accessToken,
+    "device-dashboard",
+    "dashboard-app-user"
+  );
+
+  console.log("Has dashboard role:", hasDashboardRole);
 
   useEffect(() => {
     if (status === "loading") return; // Still loading
@@ -99,6 +108,25 @@ export default function EmbeddedPage() {
                 <li>Authentication state preserved</li>
               </ul>
             </div>
+
+            {/* Dashboard role Features */}
+            {hasDashboardRole && (
+              <div className="p-3 bg-muted rounded-lg">
+                <h3 className="font-semibold text-sm mb-2">
+                  Dashboard user info
+                </h3>
+                <ul className="text-sm space-y-1 list-disc list-inside">
+                  <li>
+                    {hasDashboardRole
+                      ? "You have the dashboard-app-user role."
+                      : "You do NOT have the dashboard-app-user role."}
+                  </li>
+                  <li>
+                    This role allows access to specific dashboard features.
+                  </li>
+                </ul>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-2 pt-2">
