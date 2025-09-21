@@ -20,7 +20,7 @@ router.post("/auth/exchange", async (req, res) => {
     console.error(err);
     res
       .status(500)
-      .json({ error: "token exchange failed", details: err.message });
+      .json({ error: "X token exchange failed", details: err.message });
   }
 });
 

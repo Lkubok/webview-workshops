@@ -67,6 +67,7 @@ export default function AuthCallbackScreen() {
   const exchangeCodeForTokens = async (code: string) => {
     const KEYCLOAK_CONFIG = {
       authServerUrl: "http://192.168.233.174:4000", // Your Node.js auth server
+      // authServerUrl: "http://plague.dev/idm", // Your Node.js auth server
     };
 
     const response = await fetch(
