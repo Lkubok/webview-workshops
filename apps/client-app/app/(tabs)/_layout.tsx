@@ -9,12 +9,10 @@ export default function TabLayout() {
 
   const handleLogout = () => {
     if (Platform.OS === "web") {
-      // For web, use native browser confirm dialog
       if (window.confirm("Are you sure you want to sign out?")) {
         logout();
       }
     } else {
-      // For mobile, use React Native Alert
       Alert.alert("Sign Out", "Are you sure you want to sign out?", [
         { text: "Cancel", style: "cancel" },
         {

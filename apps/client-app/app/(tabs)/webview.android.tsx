@@ -21,50 +21,42 @@ export default function WebViewScreen() {
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(false);
 
-  // Handle navigation state changes
   const handleNavigationStateChange = (navState: any) => {
     setCanGoBack(navState.canGoBack);
     setCanGoForward(navState.canGoForward);
     setLoading(navState.loading);
   };
 
-  // Handle load start
   const handleLoadStart = () => {
     setLoading(true);
     setError(null);
   };
 
-  // Handle load end
   const handleLoadEnd = () => {
     setLoading(false);
   };
 
-  // Handle errors
   const handleError = (errorEvent: any) => {
     setLoading(false);
     setError(`Failed to load: ${errorEvent.nativeEvent.description}`);
   };
 
-  // Refresh webview
   const handleRefresh = () => {
     webViewRef.current?.reload();
   };
 
-  // Go back
   const handleGoBack = () => {
     if (canGoBack) {
       webViewRef.current?.goBack();
     }
   };
 
-  // Go forward
   const handleGoForward = () => {
     if (canGoForward) {
       webViewRef.current?.goForward();
     }
   };
 
-  // Get all cookies for the domain
   const getCookies = useCallback(async () => {
     try {
       const cookies = await CookieManager.get(WEBVIEW_URL);
@@ -85,7 +77,6 @@ export default function WebViewScreen() {
     }
   }, []);
 
-  // Set a custom cookie
   const setCookie = useCallback(async () => {
     Alert.prompt(
       "Set Cookie",
@@ -94,7 +85,7 @@ export default function WebViewScreen() {
         { text: "Cancel", style: "cancel" },
         {
           text: "Set",
-          onPress: async (cookieString) => {
+          onPress: async (cookieString: any) => {
             if (!cookieString || !cookieString.includes("=")) {
               Alert.alert("Error", "Invalid cookie format. Use: name=value");
               return;
@@ -135,6 +126,7 @@ export default function WebViewScreen() {
           style: "destructive",
           onPress: async () => {
             try {
+              // @ts-ignore
               await CookieManager.clearByName(WEBVIEW_URL);
               Alert.alert("Success", "Cookies cleared successfully");
               webViewRef.current?.reload();

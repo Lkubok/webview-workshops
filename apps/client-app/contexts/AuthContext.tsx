@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     null
   );
 
-  // Log configuration on startup for debugging
   useEffect(() => {
     console.log("AuthProvider initialized with config:", {
       platform: Platform.OS,
@@ -86,7 +85,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await StorageUtils.setItem("token_expiry", expiry.toString());
     }
 
-    // Update state
     setAccessToken(tokens.access_token);
     setRefreshTokenValue(tokens.refresh_token ?? null);
   }, []);
@@ -97,7 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await StorageUtils.deleteItem("token_expiry");
     if (Platform.OS === "web") await StorageUtils.deleteItem("auth_state");
 
-    // Clear state
     setAccessToken(null);
     setRefreshTokenValue(null);
   }, []);
@@ -170,7 +167,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async () => {
     try {
-      // Test network connectivity first for mobile
       if (Platform.OS !== "web") {
         console.log("Testing network connectivity...");
         try {
@@ -200,13 +196,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // For React Native with expo-prebuild
       const { AuthRequest, makeRedirectUri } = await import(
         "expo-auth-session"
       );
       type AuthRequestConfig = import("expo-auth-session").AuthRequestConfig;
 
-      // For expo-prebuild, always use the native app scheme
       const redirectUri = makeRedirectUri({
         native: "com.anonymous.clientapp://auth-callback",
         scheme: "com.anonymous.clientapp",
@@ -223,7 +217,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         scopes: ["openid", "profile", "email"],
         redirectUri,
         responseType: "code",
-        additionalParameters: {},
         extraParams: {},
       };
 
@@ -241,10 +234,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const result = await request.promptAsync({
         authorizationEndpoint: authUrl,
-        // Don't specify tokenEndpoint since we're handling token exchange on our backend
       });
 
-      console.log("Auth result:", { type: result.type, params: result.params });
+      console.log("Auth result:", { type: result.type });
 
       if (result.type === "success" && result.params.code) {
         console.log("Authentication successful, exchanging code for tokens...");
@@ -258,7 +250,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         );
       } else if (result.type === "cancel") {
         console.log("Authentication was cancelled by user or redirect failed");
-        // Check if this might be a redirect issue rather than user cancellation
         throw new Error(
           "Authentication was cancelled. This might be due to redirect URI configuration. Please check that 'com.anonymous.clientapp://auth-callback' is added to your Keycloak client's Valid Redirect URIs."
         );
@@ -312,7 +303,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (userInfo) {
             setUser(userInfo);
           } else {
-            // Token might be expired, try refresh
             await refreshToken();
           }
         }
