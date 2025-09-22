@@ -1,15 +1,18 @@
-# Exercise 2: Token Exchange via Hash Parameters
+# Exercise 4: Token Exchange via Hash Parameters
 
 ## Goal
+
 Implement token exchange between React Native and Next.js using URL hash parameters, with the ability to refresh tokens on demand.
 
 ## Scenario
+
 - React Native should send a token to the Next.js page via hash parameters in the URL
 - Next.js page should extract and display the token from the hash parameters
 - Next.js should have a "Refresh Token" button that requests a new token from React Native
 - React Native should generate a new token and send it to the webview when requested
 
 ## Files Structure
+
 ```
 exercise-2/
 ├── mobile-app/
@@ -24,6 +27,7 @@ exercise-2/
 ## Tasks to Complete
 
 ### Mobile App (React Native) - `webview-initial.tsx`
+
 1. **Add token state**: Manage current token with `useState`
 2. **Implement `handleMessage`**: Add case for "refresh_token_request"
 3. **Implement `refreshToken`**: Generate new token and navigate webview with new hash
@@ -31,6 +35,7 @@ exercise-2/
 5. **URL Format**: `${WEBVIEW_URL}#token=${encodeURIComponent(token)}`
 
 ### Next.js Page - `page-initial.tsx`
+
 1. **Add token state**: Store received token with `useState`
 2. **Extract token from hash**: Parse `window.location.hash` to get token parameter
 3. **Listen for hash changes**: Handle URL updates when new tokens are sent
@@ -38,6 +43,7 @@ exercise-2/
 5. **Clean up hash**: Remove hash from URL after extracting token
 
 ## Key Concepts
+
 - **Hash Parameters**: Use URL hash (#) to pass data: `#token=abc123`
 - **URL Navigation**: Use `webViewRef.current.injectJavaScript()` to navigate
 - **Hash Parsing**: Use `URLSearchParams` to parse hash parameters
@@ -45,6 +51,7 @@ exercise-2/
 - **Message Communication**: Bidirectional messages for token refresh requests
 
 ## Expected Behavior
+
 1. User taps "Send Initial Token" in React Native
 2. WebView navigates to URL with token in hash: `http://example.com#token=abc123`
 3. Next.js extracts token from hash and displays it
@@ -54,6 +61,7 @@ exercise-2/
 7. Next.js receives and displays the new token
 
 ## URL Examples
+
 ```
 Initial: https://yourapp.com/embedded
 With token: https://yourapp.com/embedded#token=initial-token-12345
@@ -61,6 +69,7 @@ After refresh: https://yourapp.com/embedded#token=token-1634567890123-xyz789
 ```
 
 ## Testing
+
 1. Start with `webview-initial.tsx` and `page-initial.tsx`
 2. Implement token sending from React Native first
 3. Implement token extraction in Next.js
@@ -69,6 +78,7 @@ After refresh: https://yourapp.com/embedded#token=token-1634567890123-xyz789
 6. Compare with final versions if needed
 
 ## Security Notes
+
 - In production, use secure token generation
 - Consider token expiration and validation
 - Hash parameters are visible in browser history - use with caution for sensitive data
