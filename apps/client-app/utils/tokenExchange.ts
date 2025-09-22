@@ -178,6 +178,11 @@ function parseTokenExchangeError(
         return "Token exchange not allowed for this client. Please check Keycloak client permissions.";
       case "invalid_audience":
         return "Invalid audience. Ensure the target client exists and allows token exchange.";
+      case "access_denied":
+        if (errorData.error_description?.includes("token audience")) {
+          return "Token audience issue. Check that 'client-app' token includes 'device-dashboard' in audience via audience mapper.";
+        }
+        return `Access denied: ${errorData.error_description || "Token exchange not permitted"}`;
       case "unsupported_grant_type":
         return "Token exchange not supported. Please enable token exchange in Keycloak.";
       default:
