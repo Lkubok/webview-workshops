@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
@@ -31,6 +31,9 @@ export default function WebViewScreen() {
     injectJavaScript,
   } = useWebView();
 
+  // TODO: Add state to manage current token
+  const [currentToken, setCurrentToken] = useState("initial-token-12345");
+
   const handleCookieMenu = useCallback(() => {
     cookieUtils.showCookieMenu(injectJavaScript, handleRefresh);
   }, [injectJavaScript, handleRefresh]);
@@ -48,10 +51,7 @@ export default function WebViewScreen() {
           console.log("Syncing cookies:", data.cookies);
           Alert.alert("WebView Cookies", data.cookies || "No cookies found");
           break;
-        case "counter_updated":
-          console.log("Counter updated in webview:", data.counter);
-          // Just log the update, no alert needed when triggered from React Native button
-          break;
+        // TODO: Add case for "refresh_token_request" to handle token refresh requests from webview
         default:
           console.log("Unknown message type:", data.type);
       }
@@ -60,17 +60,18 @@ export default function WebViewScreen() {
     }
   }, []);
 
-  const handleIncrementCounter = useCallback(() => {
-    // Send message to webview using React Native WebView's built-in postMessage
-    const message = JSON.stringify({
-      type: "increment_counter",
-    });
+  // TODO: Implement function to generate new token and send it to webview
+  const refreshToken = useCallback(() => {
+    // TODO: Generate new token (simulate API call)
+    // TODO: Update currentToken state
+    // TODO: Navigate webview to URL with new token in hash params
+  }, []);
 
-    // Use WebView's postMessage method for proper React Native → WebView communication
-    if (webViewRef.current) {
-      webViewRef.current.postMessage(message);
-    }
-  }, [webViewRef]);
+  // TODO: Implement function to send initial token to webview on load
+  const sendInitialToken = useCallback(() => {
+    // TODO: Construct URL with token in hash params
+    // TODO: Navigate webview to the URL with token
+  }, [currentToken]);
 
   if (error) {
     return <ErrorDisplay error={error} onRetry={handleRefresh} />;
@@ -87,14 +88,16 @@ export default function WebViewScreen() {
         onCookieMenu={handleCookieMenu}
       />
 
-      <TouchableOpacity
-        style={styles.incrementButton}
-        onPress={handleIncrementCounter}
-      >
-        <Text style={styles.incrementButtonText}>
-          Increment Counter in WebView
-        </Text>
+      {/* TODO: Add button to send initial token */}
+      <TouchableOpacity style={styles.tokenButton} onPress={sendInitialToken}>
+        <Text style={styles.tokenButtonText}>Send Initial Token</Text>
       </TouchableOpacity>
+
+      {/* Current token display */}
+      <View style={styles.tokenDisplay}>
+        <Text style={styles.tokenLabel}>Current Token:</Text>
+        <Text style={styles.tokenValue}>{currentToken}</Text>
+      </View>
 
       <LoadingOverlay visible={loading} />
 
@@ -122,16 +125,34 @@ const styles = StyleSheet.create({
   webview: {
     flex: 1,
   },
-  incrementButton: {
-    backgroundColor: "#007AFF",
+  tokenButton: {
+    backgroundColor: "#34C759",
     padding: 15,
-    margin: 10,
+    marginHorizontal: 10,
+    marginTop: 10,
     borderRadius: 8,
     alignItems: "center",
   },
-  incrementButtonText: {
+  tokenButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  tokenDisplay: {
+    padding: 10,
+    marginHorizontal: 10,
+    backgroundColor: "#f5f5f5",
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  tokenLabel: {
+    fontSize: 12,
+    color: "#666",
+    marginBottom: 4,
+  },
+  tokenValue: {
+    fontSize: 14,
+    fontFamily: "monospace",
+    color: "#333",
   },
 });

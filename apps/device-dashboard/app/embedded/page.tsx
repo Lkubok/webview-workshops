@@ -14,14 +14,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useHasRole } from "@/hooks/useRole";
 
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void;
-    };
-  }
-}
-
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
   const accessToken = (session as typeof session & { accessToken?: string })
@@ -33,7 +25,8 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  const [counter, setCounter] = useState(0);
+  // TODO: Add state for token from hash params
+  const [receivedToken, setReceivedToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -42,73 +35,19 @@ export default function EmbeddedPage() {
     }
   }, [session, status, router]);
 
+  // TODO: Add useEffect to extract token from hash params
   useEffect(() => {
-    const handleWindowMessage = (event: MessageEvent) => {
-      try {
-        // Handle messages sent from React Native WebView's postMessage
-        let messageData;
-
-        // React Native WebView sends messages in event.data directly
-        if (typeof event.data === 'string') {
-          messageData = JSON.parse(event.data);
-        } else {
-          messageData = event.data;
-        }
-
-        console.log("Received message from React Native:", messageData);
-
-        if (messageData.type === "increment_counter") {
-          setCounter((prevCounter) => {
-            const newCounter = prevCounter + 1;
-            sendCounterUpdate(newCounter);
-            return newCounter;
-          });
-        }
-      } catch (error) {
-        console.log("Error parsing message:", error);
-        console.log("Raw event data:", event.data);
-      }
-    };
-
-    const handleDocumentMessage = (event: Event) => {
-      // Handle React Native WebView messages that come through document
-      const messageEvent = event as MessageEvent;
-      handleWindowMessage(messageEvent);
-    };
-
-    // Listen for messages from React Native WebView
-    window.addEventListener("message", handleWindowMessage);
-
-    // Also listen for the 'message' event on document for React Native WebView compatibility
-    document.addEventListener("message", handleDocumentMessage);
-
-    return () => {
-      window.removeEventListener("message", handleWindowMessage);
-      document.removeEventListener("message", handleDocumentMessage);
-    };
+    // TODO: Check if window.location.hash contains token
+    // TODO: Extract token from hash params (e.g., #token=abc123)
+    // TODO: Update receivedToken state
+    // TODO: Optionally clean up the hash from URL
   }, []);
 
-  const sendCounterUpdate = (newCounter: number) => {
-    const message = JSON.stringify({
-      type: "counter_updated",
-      counter: newCounter,
-    });
-
-    // Send message back to React Native WebView
-    if (window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(message);
-    } else {
-      console.log("ReactNativeWebView not available");
-    }
-  };
-
-  const incrementCounter = () => {
-    const newCounter = counter + 1;
-    setCounter(newCounter);
-    sendCounterUpdate(newCounter);
-
-    // Show alert when using local Next.js button
-    alert(`Counter incremented locally to: ${newCounter}`);
+  // TODO: Add function to request token refresh from React Native
+  const requestTokenRefresh = () => {
+    // TODO: Send message to React Native requesting token refresh
+    // Use window.ReactNativeWebView?.postMessage() if available
+    // Send message with type "refresh_token_request"
   };
 
   if (status === "loading") {
@@ -142,35 +81,57 @@ export default function EmbeddedPage() {
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">
-            Exercise 1: Two-Way Communication
-          </h1>
+          <h1 className="text-2xl font-bold">Exercise 2: Token Exchange</h1>
           <p className="text-muted-foreground text-sm">
-            Counter controlled from React Native WebView
+            Token passed from React Native via hash params
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Counter Component</CardTitle>
+            <CardTitle className="text-lg">Token Display</CardTitle>
             <CardDescription>
-              This counter can be incremented from the React Native app
+              Token received from React Native WebView via hash parameters
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Counter Display */}
-            <div className="text-center p-6 bg-muted rounded-lg">
-              <h2 className="text-3xl font-bold mb-2">Counter: {counter}</h2>
-              <p className="text-sm text-muted-foreground">
-                Use the button in the React Native app to increment this counter
-              </p>
+            {/* Token Display */}
+            <div className="p-6 bg-muted rounded-lg">
+              <h3 className="font-semibold mb-2">Received Token:</h3>
+              {receivedToken ? (
+                <div className="bg-white p-3 rounded border font-mono text-sm break-all">
+                  {receivedToken}
+                </div>
+              ) : (
+                <div className="text-muted-foreground italic">
+                  No token received yet. Use "Send Initial Token" button in the
+                  React Native app.
+                </div>
+              )}
             </div>
 
-            {/* Local increment button for testing */}
+            {/* Token Refresh Button */}
             <div className="flex justify-center">
-              <Button onClick={incrementCounter} variant="outline">
-                Local Increment (for testing)
+              <Button
+                onClick={requestTokenRefresh}
+                variant="default"
+                disabled={!receivedToken}
+              >
+                Refresh Token
               </Button>
+            </div>
+
+            {/* Instructions */}
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-sm mb-2 text-blue-900">
+                Instructions:
+              </h3>
+              <ol className="text-sm space-y-1 list-decimal list-inside text-blue-800">
+                <li>Use "Send Initial Token" button in React Native app</li>
+                <li>Token should appear above</li>
+                <li>Use "Refresh Token" button to request new token</li>
+                <li>New token should be sent from React Native</li>
+              </ol>
             </div>
 
             {/* User Info */}
@@ -191,8 +152,8 @@ export default function EmbeddedPage() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 1: Two-way communication implemented between React Native
-            and Next.js
+            Exercise 2: Implement token exchange between React Native and
+            Next.js
           </p>
         </div>
       </div>
