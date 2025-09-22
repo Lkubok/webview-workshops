@@ -20,7 +20,7 @@ export class TokenExchangeError extends Error {
 }
 
 export async function exchangeToken(options: TokenExchangeOptions): Promise<string> {
-  const { currentToken, audience, clientId = KEYCLOAK_CONFIG.clientId } = options;
+  const { currentToken, audience, clientId = 'token-exchange-service' } = options;
 
   if (!currentToken) {
     throw new TokenExchangeError("Current token is required for exchange");
