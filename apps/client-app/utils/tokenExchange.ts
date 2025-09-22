@@ -1,4 +1,4 @@
-import { KEYCLOAK_CONFIG } from '../contexts/authConfig';
+import { KEYCLOAK_CONFIG } from "../contexts/authConfig";
 
 export interface TokenExchangeOptions {
   currentToken: string;
@@ -13,14 +13,24 @@ export interface TokenExchangeResult {
 }
 
 export class TokenExchangeError extends Error {
-  constructor(message: string, public statusCode?: number, public originalError?: any) {
+  constructor(
+    message: string,
+    public statusCode?: number,
+    public originalError?: any
+  ) {
     super(message);
-    this.name = 'TokenExchangeError';
+    this.name = "TokenExchangeError";
   }
 }
 
-export async function exchangeToken(options: TokenExchangeOptions): Promise<string> {
-  const { currentToken, audience, clientId = 'token-exchange-service' } = options;
+export async function exchangeToken(
+  options: TokenExchangeOptions
+): Promise<string> {
+  const {
+    currentToken,
+    audience,
+    clientId = "token-exchange-service",
+  } = options;
 
   if (!currentToken) {
     throw new TokenExchangeError("Current token is required for exchange");
@@ -32,18 +42,40 @@ export async function exchangeToken(options: TokenExchangeOptions): Promise<stri
     const tokenEndpoint = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/token`;
 
     const formData = new URLSearchParams();
-    formData.append('grant_type', 'urn:ietf:params:oauth:grant-type:token-exchange');
-    formData.append('client_id', clientId);
-    formData.append('subject_token', currentToken);
-    formData.append('subject_token_type', 'urn:ietf:params:oauth:token-type:access_token');
-    formData.append('audience', audience);
-    formData.append('requested_token_type', 'urn:ietf:params:oauth:token-type:access_token');
+    formData.append(
+      "grant_type",
+      "urn:ietf:params:oauth:grant-type:token-exchange"
+    );
+    formData.append("client_id", clientId);
+
+    // For confidential clients, we need client credentials
+    if (clientId === "token-exchange-service") {
+      const clientSecret = (KEYCLOAK_CONFIG as any).tokenExchangeClientSecret;
+      if (clientSecret && clientSecret !== "YOUR_TOKEN_EXCHANGE_SERVICE_CLIENT_SECRET") {
+        formData.append("client_secret", clientSecret);
+      } else {
+        throw new TokenExchangeError(
+          "Token exchange client secret not configured. Please set tokenExchangeClientSecret in authConfig.ts"
+        );
+      }
+    }
+
+    formData.append("subject_token", currentToken);
+    formData.append(
+      "subject_token_type",
+      "urn:ietf:params:oauth:token-type:access_token"
+    );
+    formData.append("audience", audience);
+    formData.append(
+      "requested_token_type",
+      "urn:ietf:params:oauth:token-type:access_token"
+    );
 
     const response = await fetch(tokenEndpoint, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Accept': 'application/json',
+        "Content-Type": "application/x-www-form-urlencoded",
+        Accept: "application/json",
       },
       body: formData.toString(),
     });
@@ -54,22 +86,26 @@ export async function exchangeToken(options: TokenExchangeOptions): Promise<stri
       console.error("Token exchange failed:", {
         status: response.status,
         statusText: response.statusText,
-        body: responseText
+        body: responseText,
       });
 
-      const errorMessage = parseTokenExchangeError(responseText, response.status);
+      const errorMessage = parseTokenExchangeError(
+        responseText,
+        response.status
+      );
       throw new TokenExchangeError(errorMessage, response.status);
     }
 
     const result: TokenExchangeResult = JSON.parse(responseText);
 
     if (!result.access_token) {
-      throw new TokenExchangeError('No access token received from token exchange');
+      throw new TokenExchangeError(
+        "No access token received from token exchange"
+      );
     }
 
     console.log("✅ Token exchange successful!");
     return result.access_token;
-
   } catch (error) {
     if (error instanceof TokenExchangeError) {
       throw error;
@@ -77,7 +113,7 @@ export async function exchangeToken(options: TokenExchangeOptions): Promise<stri
 
     console.error("Token exchange error:", error);
     throw new TokenExchangeError(
-      error instanceof Error ? error.message : 'Unknown token exchange error'
+      error instanceof Error ? error.message : "Unknown token exchange error"
     );
   }
 }
@@ -89,7 +125,10 @@ export async function exchangeTokenWithFallback(
   try {
     return await exchangeToken({ currentToken, audience });
   } catch (error) {
-    if (KEYCLOAK_CONFIG.authServerUrl && !(error instanceof Error && error.message.includes('server-side'))) {
+    if (
+      KEYCLOAK_CONFIG.authServerUrl &&
+      !(error instanceof Error && error.message.includes("server-side"))
+    ) {
       console.log("⚠️ Attempting server-side token exchange fallback...");
       try {
         return await serverSideTokenExchange(currentToken, audience);
@@ -101,14 +140,17 @@ export async function exchangeTokenWithFallback(
   }
 }
 
-async function serverSideTokenExchange(currentToken: string, audience: string): Promise<string> {
+async function serverSideTokenExchange(
+  currentToken: string,
+  audience: string
+): Promise<string> {
   const serverResponse = await fetch(
     `${KEYCLOAK_CONFIG.authServerUrl}/auth/exchange-token`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${currentToken}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${currentToken}`,
       },
       body: JSON.stringify({ audience }),
     }
@@ -124,17 +166,20 @@ async function serverSideTokenExchange(currentToken: string, audience: string): 
   return serverResult.access_token;
 }
 
-function parseTokenExchangeError(responseText: string, statusCode: number): string {
+function parseTokenExchangeError(
+  responseText: string,
+  statusCode: number
+): string {
   try {
     const errorData = JSON.parse(responseText);
 
     switch (errorData.error) {
-      case 'invalid_client':
-        return 'Token exchange not allowed for this client. Please check Keycloak client permissions.';
-      case 'invalid_audience':
-        return 'Invalid audience. Ensure the target client exists and allows token exchange.';
-      case 'unsupported_grant_type':
-        return 'Token exchange not supported. Please enable token exchange in Keycloak.';
+      case "invalid_client":
+        return "Token exchange not allowed for this client. Please check Keycloak client permissions.";
+      case "invalid_audience":
+        return "Invalid audience. Ensure the target client exists and allows token exchange.";
+      case "unsupported_grant_type":
+        return "Token exchange not supported. Please enable token exchange in Keycloak.";
       default:
         return `Token exchange failed: ${errorData.error_description || errorData.error}`;
     }

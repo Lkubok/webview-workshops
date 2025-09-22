@@ -53,7 +53,7 @@ export function TokenExchange({ accessToken }: TokenExchangeProps) {
 
         // Provide specific guidance for common issues
         if (error.message.includes("not enabled for the requested client")) {
-          detailedMessage = "\n\nKeycloak Setup Required:\n1. In Keycloak Admin Console, go to Clients\n2. Edit 'token-exchange-service' client\n3. Enable 'Standard Flow Enabled'\n4. In 'Service Account Roles', add 'token-exchange' role\n5. Configure audience mapping for 'device-dashboard'";
+          detailedMessage = "\n\nKeycloak Setup Required:\n1. Create 'token-exchange' role in Realm Settings → Roles\n2. Go to Clients → 'token-exchange-service'\n3. Enable 'Service Accounts Enabled'\n4. In 'Service Account Roles' tab:\n   - Select 'realm-management' client roles\n   - Add 'token-exchange' role\n5. Ensure 'device-dashboard' client exists and allows token exchange";
         } else if (error.message.includes("invalid_audience")) {
           detailedMessage = "\n\nCheck that:\n1. 'device-dashboard' client exists in Keycloak\n2. 'token-exchange-service' has permission to exchange tokens for 'device-dashboard'";
         }
