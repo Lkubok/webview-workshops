@@ -1,224 +1,33 @@
-import React, { useRef, useState, useCallback } from "react";
-import {
-  View,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-  Text,
-  ActivityIndicator,
-  Platform,
-} from "react-native";
+import React, { useCallback } from "react";
+import { View, StyleSheet, Alert } from "react-native";
 import { WebView } from "react-native-webview";
-import { Ionicons } from "@expo/vector-icons";
-import CookieManager from "@react-native-cookies/cookies";
-
-const WEBVIEW_URL = "http://device-dashboard.localhost:3010/embedded";
+import { useWebView } from "../../hooks/useWebView";
+import { NavigationBar, ErrorDisplay, LoadingOverlay } from "../../components/WebView";
+import { cookieUtils } from "../../utils/cookieManager";
+import { WEBVIEW_URL, injectedJavaScript, webViewProps } from "../../utils/webViewConfig";
 
 export default function WebViewScreen() {
-  const webViewRef = useRef<WebView>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [canGoBack, setCanGoBack] = useState(false);
-  const [canGoForward, setCanGoForward] = useState(false);
+  const {
+    webViewRef,
+    loading,
+    error,
+    canGoBack,
+    canGoForward,
+    handleNavigationStateChange,
+    handleLoadStart,
+    handleLoadEnd,
+    handleError,
+    handleRefresh,
+    handleGoBack,
+    handleGoForward,
+    injectJavaScript,
+  } = useWebView();
 
-  const handleNavigationStateChange = (navState: any) => {
-    setCanGoBack(navState.canGoBack);
-    setCanGoForward(navState.canGoForward);
-    setLoading(navState.loading);
-  };
+  const handleCookieMenu = useCallback(() => {
+    cookieUtils.showCookieMenu(injectJavaScript, handleRefresh);
+  }, [injectJavaScript, handleRefresh]);
 
-  const handleLoadStart = () => {
-    setLoading(true);
-    setError(null);
-  };
-
-  const handleLoadEnd = () => {
-    setLoading(false);
-  };
-
-  const handleError = (errorEvent: any) => {
-    setLoading(false);
-    setError(`Failed to load: ${errorEvent.nativeEvent.description}`);
-  };
-
-  const handleRefresh = () => {
-    webViewRef.current?.reload();
-  };
-
-  const handleGoBack = () => {
-    if (canGoBack) {
-      webViewRef.current?.goBack();
-    }
-  };
-
-  const handleGoForward = () => {
-    if (canGoForward) {
-      webViewRef.current?.goForward();
-    }
-  };
-
-  const getCookies = useCallback(async () => {
-    try {
-      const cookies = await CookieManager.get(WEBVIEW_URL);
-
-      if (Object.keys(cookies).length === 0) {
-        Alert.alert("Cookies", "No cookies found for this domain");
-        return;
-      }
-
-      const cookieList = Object.entries(cookies)
-        .map(([name, cookie]) => `${name}: ${cookie.value}`)
-        .join("\n");
-
-      Alert.alert("Current Cookies", cookieList);
-      console.log("Cookies:", cookies);
-    } catch (error) {
-      console.error("Error getting cookies:", error);
-      Alert.alert("Error", "Failed to retrieve cookies");
-    }
-  }, []);
-
-  const setCookie = useCallback(async () => {
-    Alert.prompt(
-      "Set Cookie",
-      "Enter cookie in format: name=value",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Set",
-          onPress: async (cookieString: any) => {
-            if (!cookieString || !cookieString.includes("=")) {
-              Alert.alert("Error", "Invalid cookie format. Use: name=value");
-              return;
-            }
-
-            try {
-              const [name, ...valueParts] = cookieString.split("=");
-              const value = valueParts.join("="); // Handle values with = in them
-
-              // Method 1: Set cookie via CookieManager
-              await CookieManager.set(WEBVIEW_URL, {
-                name: name.trim(),
-                value: value.trim(),
-                domain: "localhost",
-                path: "/",
-                httpOnly: false, // Allow JavaScript access
-                secure: false, // Since using http://
-              });
-
-              // Method 2: Also inject the cookie via JavaScript
-              const jsCode = `
-                try {
-                  document.cookie = "${name.trim()}=${value.trim()}; path=/; domain=localhost";
-                  console.log('Cookie set via JS:', document.cookie);
-                } catch(e) {
-                  console.error('Error setting cookie via JS:', e);
-                }
-                true;
-              `;
-
-              webViewRef.current?.injectJavaScript(jsCode);
-
-              Alert.alert("Success", "Cookie set successfully. Refreshing...");
-
-              // Reload after a short delay
-              setTimeout(() => {
-                webViewRef.current?.reload();
-              }, 500);
-            } catch (error) {
-              console.error("Error setting cookie:", error);
-              Alert.alert("Error", "Failed to set cookie");
-            }
-          },
-        },
-      ],
-      "plain-text"
-    );
-  }, []);
-
-  // Clear all cookies for the domain
-  const clearCookies = useCallback(async () => {
-    Alert.alert(
-      "Clear Cookies",
-      "Are you sure you want to clear all cookies for this domain?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Clear",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              // Clear via CookieManager
-              await CookieManager.clearAll();
-
-              // Also clear via JavaScript
-              const jsCode = `
-                document.cookie.split(";").forEach(function(c) { 
-                  document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-                });
-                true;
-              `;
-
-              webViewRef.current?.injectJavaScript(jsCode);
-
-              setTimeout(() => {
-                webViewRef.current?.reload();
-              }, 100);
-
-              Alert.alert("Success", "Cookies cleared successfully");
-            } catch (error) {
-              console.error("Error clearing cookies:", error);
-              Alert.alert("Error", "Failed to clear cookies");
-            }
-          },
-        },
-      ]
-    );
-  }, []);
-
-  // Show cookie management options
-  const showCookieMenu = () => {
-    Alert.alert("Cookie Management", "Choose an action:", [
-      { text: "View Cookies", onPress: getCookies },
-      { text: "Set Cookie", onPress: setCookie },
-      { text: "Clear Cookies", onPress: clearCookies, style: "destructive" },
-      { text: "Sync Cookies", onPress: syncCookies },
-      { text: "Cancel", style: "cancel" },
-    ]);
-  };
-
-  // New function to sync cookies from webview to native
-  const syncCookies = useCallback(() => {
-    const jsCode = `
-      window.ReactNativeWebView.postMessage(JSON.stringify({
-        type: 'sync_cookies',
-        cookies: document.cookie
-      }));
-      true;
-    `;
-
-    webViewRef.current?.injectJavaScript(jsCode);
-  }, []);
-
-  // Enhanced injected JavaScript
-  const injectedJavaScript = `
-    (function() {
-      console.log('WebView loaded successfully');
-      console.log('Current cookies:', document.cookie);
-      
-      // Send initial cookies to React Native
-      if (window.ReactNativeWebView) {
-        window.ReactNativeWebView.postMessage(JSON.stringify({
-          type: 'cookies',
-          cookies: document.cookie
-        }));
-      }
-    })();
-    true;
-  `;
-
-  // Enhanced message handler
-  const handleMessage = (event: any) => {
+  const handleMessage = useCallback((event: any) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       console.log("Message from webview:", data);
@@ -237,66 +46,25 @@ export default function WebViewScreen() {
     } catch (error) {
       console.log("Received non-JSON message:", event.nativeEvent.data);
     }
-  };
+  }, []);
 
   if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Ionicons name="warning-outline" size={64} color="#ff6b6b" />
-        <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={handleRefresh}>
-          <Text style={styles.retryButtonText}>Retry</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    return <ErrorDisplay error={error} onRetry={handleRefresh} />;
   }
 
   return (
     <View style={styles.container}>
-      {/* Navigation Bar */}
-      <View style={styles.navigationBar}>
-        <TouchableOpacity
-          style={[styles.navButton, !canGoBack && styles.navButtonDisabled]}
-          onPress={handleGoBack}
-          disabled={!canGoBack}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={24}
-            color={canGoBack ? "#007AFF" : "#ccc"}
-          />
-        </TouchableOpacity>
+      <NavigationBar
+        canGoBack={canGoBack}
+        canGoForward={canGoForward}
+        onGoBack={handleGoBack}
+        onGoForward={handleGoForward}
+        onRefresh={handleRefresh}
+        onCookieMenu={handleCookieMenu}
+      />
 
-        <TouchableOpacity
-          style={[styles.navButton, !canGoForward && styles.navButtonDisabled]}
-          onPress={handleGoForward}
-          disabled={!canGoForward}
-        >
-          <Ionicons
-            name="chevron-forward"
-            size={24}
-            color={canGoForward ? "#007AFF" : "#ccc"}
-          />
-        </TouchableOpacity>
+      <LoadingOverlay visible={loading} />
 
-        <TouchableOpacity style={styles.navButton} onPress={handleRefresh}>
-          <Ionicons name="refresh" size={24} color="#007AFF" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.cookieButton} onPress={showCookieMenu}>
-          <Ionicons name="settings-outline" size={24} color="#007AFF" />
-          <Text style={styles.cookieButtonText}>Cookies</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Loading indicator */}
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      )}
-
-      {/* WebView */}
       <WebView
         ref={webViewRef}
         source={{ uri: WEBVIEW_URL }}
@@ -307,23 +75,7 @@ export default function WebViewScreen() {
         onError={handleError}
         onMessage={handleMessage}
         injectedJavaScript={injectedJavaScript}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        allowsInlineMediaPlayback={true}
-        mediaPlaybackRequiresUserAction={false}
-        mixedContentMode="compatibility"
-        allowsBackForwardNavigationGestures={true}
-        // Enhanced cookie settings
-        sharedCookiesEnabled={true}
-        thirdPartyCookiesEnabled={true}
-        incognito={false} // Ensure cookies are persisted
-        cacheEnabled={true}
-        // Additional props for better compatibility
-        originWhitelist={["*"]}
-        allowFileAccess={true}
-        allowFileAccessFromFileURLs={true}
-        allowUniversalAccessFromFileURLs={true}
+        {...webViewProps}
       />
     </View>
   );
@@ -334,78 +86,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  navigationBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: "#f8f9fa",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e9ecef",
-    ...Platform.select({
-      ios: {
-        paddingTop: 16,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  navButton: {
-    padding: 8,
-    marginRight: 12,
-  },
-  navButtonDisabled: {
-    opacity: 0.5,
-  },
-  cookieButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 6,
-    marginLeft: "auto",
-  },
-  cookieButtonText: {
-    color: "white",
-    fontSize: 14,
-    fontWeight: "600",
-    marginLeft: 4,
-  },
-  loadingContainer: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: [{ translateX: -20 }, { translateY: -20 }],
-    zIndex: 1,
-  },
   webview: {
     flex: 1,
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#f8f9fa",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#6c757d",
-    textAlign: "center",
-    marginVertical: 20,
-    lineHeight: 24,
-  },
-  retryButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  retryButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
   },
 });
