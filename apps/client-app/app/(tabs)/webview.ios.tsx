@@ -1,90 +1,17 @@
-import React, { useCallback } from "react";
-import { View, StyleSheet, Alert } from "react-native";
-import { WebView } from "react-native-webview";
-import { useWebView } from "../../hooks/useWebView";
-import {
-  NavigationBar,
-  ErrorDisplay,
-  LoadingOverlay,
-} from "../../components/WebView";
-import { cookieUtils } from "../../utils/cookieManager";
-import {
-  WEBVIEW_URL,
-  injectedJavaScript,
-  webViewProps,
-} from "../../utils/webViewConfig";
+import React from "react";
+import { View, StyleSheet, Text } from "react-native";
 
 export default function WebViewScreen() {
-  const {
-    webViewRef,
-    loading,
-    error,
-    canGoBack,
-    canGoForward,
-    handleNavigationStateChange,
-    handleLoadStart,
-    handleLoadEnd,
-    handleError,
-    handleRefresh,
-    handleGoBack,
-    handleGoForward,
-    injectJavaScript,
-  } = useWebView();
-
-  const handleCookieMenu = useCallback(() => {
-    cookieUtils.showCookieMenu(injectJavaScript, handleRefresh);
-  }, [injectJavaScript, handleRefresh]);
-
-  const handleMessage = useCallback((event: any) => {
-    try {
-      const data = JSON.parse(event.nativeEvent.data);
-      console.log("Message from webview:", data);
-
-      switch (data.type) {
-        case "cookies":
-          console.log("Cookies from webview:", data.cookies);
-          break;
-        case "sync_cookies":
-          console.log("Syncing cookies:", data.cookies);
-          Alert.alert("WebView Cookies", data.cookies || "No cookies found");
-          break;
-        default:
-          console.log("Unknown message type:", data.type);
-      }
-    } catch (error) {
-      console.log("Received non-JSON message:", event.nativeEvent.data);
-    }
-  }, []);
-
-  if (error) {
-    return <ErrorDisplay error={error} onRetry={handleRefresh} />;
-  }
-
   return (
     <View style={styles.container}>
-      <NavigationBar
-        canGoBack={canGoBack}
-        canGoForward={canGoForward}
-        onGoBack={handleGoBack}
-        onGoForward={handleGoForward}
-        onRefresh={handleRefresh}
-        onCookieMenu={handleCookieMenu}
-      />
-
-      <LoadingOverlay visible={loading} />
-
-      <WebView
-        ref={webViewRef}
-        source={{ uri: WEBVIEW_URL }}
-        style={styles.webview}
-        onNavigationStateChange={handleNavigationStateChange}
-        onLoadStart={handleLoadStart}
-        onLoadEnd={handleLoadEnd}
-        onError={handleError}
-        onMessage={handleMessage}
-        injectedJavaScript={injectedJavaScript}
-        {...webViewProps}
-      />
+      <View style={styles.placeholder}>
+        <Text style={styles.placeholderText}>
+          WebView will be displayed here
+        </Text>
+        <Text style={styles.instructions}>
+          Follow the TODOs to implement the WebView component
+        </Text>
+      </View>
     </View>
   );
 }
@@ -96,5 +23,24 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  placeholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  placeholderText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#666",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  instructions: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });
