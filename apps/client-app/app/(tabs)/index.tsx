@@ -1,7 +1,12 @@
 import React from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
-import { WelcomeHeader, UserInfo, Button, TokenDisplay, TokenExchange } from "../../components";
+import {
+  WelcomeHeader,
+  UserInfo,
+  Button,
+  TokenDisplay,
+} from "../../components";
 import { useTokenRefresh } from "../../hooks";
 import { commonStyles, typography } from "../../styles/theme";
 
@@ -24,7 +29,7 @@ export default function HomeScreen() {
           variant="secondary"
         />
 
-        {accessToken && <TokenExchange accessToken={accessToken} />}
+        {/* {accessToken && <TokenExchange accessToken={accessToken} />} */}
 
         {accessToken && <TokenDisplay accessToken={accessToken} />}
 
