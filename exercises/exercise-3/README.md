@@ -4,6 +4,10 @@
 
 Implement cookie handling and communication between React Native WebView and Next.js application.
 
+## Helpful Links
+
+- [React Native WebView Documentation](https://github.com/react-native-webview/react-native-webview/blob/master/docs/Reference.md)
+
 ## Scenario
 
 - Start with a basic WebView (similar to Exercise 1 final state)
@@ -14,7 +18,7 @@ Implement cookie handling and communication between React Native WebView and Nex
 ## Files Structure
 
 ```
-exercise-2/
+exercise-3/
 ├── mobile-app/
 │   ├── webview-initial.tsx    # Basic WebView without cookie handling
 │   └── webview-final.tsx      # Complete implementation with cookies

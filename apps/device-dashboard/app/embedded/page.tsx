@@ -14,14 +14,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useHasRole } from "@/hooks/useRole";
 
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void;
-    };
-  }
-}
-
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
   const accessToken = (session as typeof session & { accessToken?: string })
@@ -43,63 +35,12 @@ export default function EmbeddedPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    const handleWindowMessage = (event: MessageEvent) => {
-      try {
-        let messageData;
-
-        if (typeof event.data === "string") {
-          messageData = JSON.parse(event.data);
-        } else {
-          messageData = event.data;
-        }
-
-        console.log("Received message from React Native:", messageData);
-
-        if (messageData.type === "increment_counter") {
-          setCounter((prevCounter) => {
-            const newCounter = prevCounter + 1;
-            sendCounterUpdate(newCounter);
-            return newCounter;
-          });
-        }
-      } catch (error) {
-        console.log("Error parsing message:", error);
-        console.log("Raw event data:", event.data);
-      }
-    };
-
-    const handleDocumentMessage = (event: Event) => {
-      const messageEvent = event as MessageEvent;
-      handleWindowMessage(messageEvent);
-    };
-    window.addEventListener("message", handleWindowMessage);
-    document.addEventListener("message", handleDocumentMessage);
-
-    return () => {
-      window.removeEventListener("message", handleWindowMessage);
-      document.removeEventListener("message", handleDocumentMessage);
-    };
+    const handleMessage = (event: MessageEvent) => {};
   }, []);
-
-  const sendCounterUpdate = (newCounter: number) => {
-    const message = JSON.stringify({
-      type: "counter_updated",
-      counter: newCounter,
-    });
-
-    if (window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(message);
-    } else {
-      console.log("ReactNativeWebView not available");
-    }
-  };
-
+  const sendCounterUpdate = (newCounter: number) => {};
   const incrementCounter = () => {
     const newCounter = counter + 1;
     setCounter(newCounter);
-    sendCounterUpdate(newCounter);
-
-    alert(`Counter incremented locally to: ${newCounter}`);
   };
 
   if (status === "loading") {
@@ -179,8 +120,8 @@ export default function EmbeddedPage() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 1: Two-way communication implemented between React Native
-            and Next.js
+            Exercise 1: Implement two-way communication between React Native and
+            Next.js
           </p>
         </div>
       </div>

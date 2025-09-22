@@ -14,7 +14,7 @@ Implement token exchange between React Native and Next.js using URL hash paramet
 ## Files Structure
 
 ```
-exercise-2/
+exercise-4/
 ├── mobile-app/
 │   ├── webview-initial.tsx    # Starting point with TODOs
 │   └── webview-final.tsx      # Complete implementation

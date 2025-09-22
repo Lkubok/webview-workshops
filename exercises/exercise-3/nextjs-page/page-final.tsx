@@ -43,7 +43,6 @@ export default function EmbeddedPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    // Send current cookies to React Native on page load
     const currentCookies = document.cookie;
     if (currentCookies && window.ReactNativeWebView) {
       const message = JSON.stringify({
@@ -115,7 +114,6 @@ export default function EmbeddedPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Cookie Display */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">🍪 Current Cookies</h3>
               <div className="bg-white p-2 rounded border text-xs font-mono break-all">
@@ -123,14 +121,12 @@ export default function EmbeddedPage() {
               </div>
             </div>
 
-            {/* Sync Button */}
             <div className="flex justify-center">
               <Button onClick={syncCookies} variant="default">
                 Sync Cookies with Native App
               </Button>
             </div>
 
-            {/* User Info */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
               <div className="text-sm space-y-1">
@@ -144,7 +140,6 @@ export default function EmbeddedPage() {
               </div>
             </div>
 
-            {/* Dashboard Role */}
             {hasDashboardRole && (
               <div className="p-3 bg-muted rounded-lg">
                 <h3 className="font-semibold text-sm mb-2">Dashboard Access</h3>
@@ -152,7 +147,6 @@ export default function EmbeddedPage() {
               </div>
             )}
 
-            {/* Cookie Features */}
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
               <h3 className="font-semibold text-sm mb-2 text-green-900">
                 ✅ Cookie Features Implemented
