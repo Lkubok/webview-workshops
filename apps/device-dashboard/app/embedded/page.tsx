@@ -14,12 +14,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useHasRole } from "@/hooks/useRole";
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
-  console.log("NEXTJS access token");
   const accessToken = (session as typeof session & { accessToken?: string })
     ?.accessToken;
-  console.log(accessToken);
   const router = useRouter();
   const hasDashboardRole = useHasRole(
     accessToken,
@@ -27,7 +33,7 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  console.log("Has dashboard role:", hasDashboardRole);
+  const [counter, setCounter] = useState(0);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -35,6 +41,66 @@ export default function EmbeddedPage() {
       router.push("/login");
     }
   }, [session, status, router]);
+
+  useEffect(() => {
+    const handleWindowMessage = (event: MessageEvent) => {
+      try {
+        let messageData;
+
+        if (typeof event.data === "string") {
+          messageData = JSON.parse(event.data);
+        } else {
+          messageData = event.data;
+        }
+
+        console.log("Received message from React Native:", messageData);
+
+        if (messageData.type === "increment_counter") {
+          setCounter((prevCounter) => {
+            const newCounter = prevCounter + 1;
+            sendCounterUpdate(newCounter);
+            return newCounter;
+          });
+        }
+      } catch (error) {
+        console.log("Error parsing message:", error);
+        console.log("Raw event data:", event.data);
+      }
+    };
+
+    const handleDocumentMessage = (event: Event) => {
+      const messageEvent = event as MessageEvent;
+      handleWindowMessage(messageEvent);
+    };
+    window.addEventListener("message", handleWindowMessage);
+    document.addEventListener("message", handleDocumentMessage);
+
+    return () => {
+      window.removeEventListener("message", handleWindowMessage);
+      document.removeEventListener("message", handleDocumentMessage);
+    };
+  }, []);
+
+  const sendCounterUpdate = (newCounter: number) => {
+    const message = JSON.stringify({
+      type: "counter_updated",
+      counter: newCounter,
+    });
+
+    if (window.ReactNativeWebView) {
+      window.ReactNativeWebView.postMessage(message);
+    } else {
+      console.log("ReactNativeWebView not available");
+    }
+  };
+
+  const incrementCounter = () => {
+    const newCounter = counter + 1;
+    setCounter(newCounter);
+    sendCounterUpdate(newCounter);
+
+    alert(`Counter incremented locally to: ${newCounter}`);
+  };
 
   if (status === "loading") {
     return (
@@ -67,21 +133,35 @@ export default function EmbeddedPage() {
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
+          <h1 className="text-2xl font-bold">
+            Exercise 1: Two-Way Communication
+          </h1>
           <p className="text-muted-foreground text-sm">
-            Optimized for React Native WebView display
+            Counter controlled from React Native WebView
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Workshop Content</CardTitle>
+            <CardTitle className="text-lg">Counter Component</CardTitle>
             <CardDescription>
-              This page is designed to be embedded in a React Native WebView
-              component
+              This counter can be incremented from the React Native app
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="text-center p-6 bg-muted rounded-lg">
+              <h2 className="text-3xl font-bold mb-2">Counter: {counter}</h2>
+              <p className="text-sm text-muted-foreground">
+                Use the button in the React Native app to increment this counter
+              </p>
+            </div>
+
+            <div className="flex justify-center">
+              <Button onClick={incrementCounter} variant="outline">
+                Local Increment (for testing)
+              </Button>
+            </div>
+
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
               <div className="text-sm space-y-1">
@@ -94,55 +174,13 @@ export default function EmbeddedPage() {
                 </p>
               </div>
             </div>
-
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">WebView Features</h3>
-              <ul className="text-sm space-y-1 list-disc list-inside">
-                <li>Responsive design for mobile screens</li>
-                <li>Touch-friendly interface elements</li>
-                <li>Minimal navigation for embedded context</li>
-                <li>Authentication state preserved</li>
-              </ul>
-            </div>
-
-            {hasDashboardRole && (
-              <div className="p-3 bg-muted rounded-lg">
-                <h3 className="font-semibold text-sm mb-2">
-                  Dashboard user info
-                </h3>
-                <ul className="text-sm space-y-1 list-disc list-inside">
-                  <li>
-                    {hasDashboardRole
-                      ? "You have the dashboard-app-user role."
-                      : "You do NOT have the dashboard-app-user role."}
-                  </li>
-                  <li>
-                    This role allows access to specific dashboard features.
-                  </li>
-                </ul>
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
-              <Button
-                onClick={() => window.location.reload()}
-                variant="outline"
-                size="sm"
-                className="flex-1"
-              >
-                Refresh Content
-              </Button>
-              <Button onClick={goBack} size="sm" className="flex-1">
-                Return to Dashboard
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            This page is protected by Keycloak authentication and ready for
-            WebView embedding
+            Exercise 1: Two-way communication implemented between React Native
+            and Next.js
           </p>
         </div>
       </div>
