@@ -79,6 +79,56 @@ You can also run your own Keycloak instance locally for development/testing:
 3. Keycloak will be available at `http://localhost:8080` (default credentials: admin/admin).
 4. If you want to use local keycloak instance you need to change KEYCLOAK_ISSUER to your ip
 
+## Workshop Exercises
+
+This repository contains step-by-step exercises in the `exercises/` folder. Each exercise demonstrates different WebView integration patterns and features:
+
+- **Exercise 1**: Basic WebView Setup
+- **Exercise 2**: Two-Way Communication Bridge
+- **Exercise 3**: Cookie Handling and Communication
+- **Exercise 4**: Token exchange and update in webview
+- **Exercise 5**: Navigation and State Management
+
+### Exercise Structure
+
+Each exercise folder contains:
+
+- `mobile-app/`: React Native WebView component files
+  - `webview-initial.tsx` - Starting point with TODOs
+  - `webview-final.tsx` - Complete implementation
+- `nextjs-page/`: Next.js page component files
+  - `page-initial.tsx` - Starting point with TODOs
+  - `page-final.tsx` - Complete implementation
+
+### How to Use Exercise Files
+
+To work with an exercise:
+
+1. **Mobile App Component**: Replace the content of `apps/client-app/app/(tabs)/webview.tsx` with either:
+   - `webview-initial.tsx` (to start from scratch)
+   - `webview-final.tsx` (to see the complete solution)
+
+2. **Next.js Page Component**: Replace the content of `apps/device-dashboard/app/embedded/page.tsx` with either:
+   - `page-initial.tsx` (to start from scratch)
+   - `page-final.tsx` (to see the complete solution)
+
+### Exercise Branches
+
+Each exercise is also available on separate git branches following the pattern:
+
+- `exercise-1`
+- `exercise-2`
+- `exercise-3`
+- `exercise-4`
+- `exercise-5`
+
+You can switch to any exercise branch to see the complete working implementation:
+
+```sh
+git checkout exercise-1
+pnpm dev --parallel
+```
+
 ## Notes
 
 - Make sure your device/emulator can access `device-dashboard.localhost` (use the correct IP if running on a physical device).
