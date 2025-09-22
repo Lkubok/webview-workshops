@@ -14,12 +14,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useHasRole } from "@/hooks/useRole";
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage: (message: string) => void;
+    };
+  }
+}
+
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
-  console.log("NEXTJS access token");
   const accessToken = (session as typeof session & { accessToken?: string })
     ?.accessToken;
-  console.log(accessToken);
   const router = useRouter();
   const hasDashboardRole = useHasRole(
     accessToken,
@@ -27,14 +33,42 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  console.log("Has dashboard role:", hasDashboardRole);
+  const [cookies, setCookies] = useState<string>("");
 
   useEffect(() => {
-    if (status === "loading") return; // Still loading
+    if (status === "loading") return;
     if (!session) {
       router.push("/login");
     }
   }, [session, status, router]);
+
+  useEffect(() => {
+    // Send current cookies to React Native on page load
+    const currentCookies = document.cookie;
+    if (currentCookies && window.ReactNativeWebView) {
+      const message = JSON.stringify({
+        type: "cookies",
+        cookies: currentCookies,
+      });
+      window.ReactNativeWebView.postMessage(message);
+    }
+    setCookies(currentCookies);
+  }, []);
+
+  const syncCookies = () => {
+    const currentCookies = document.cookie;
+    setCookies(currentCookies);
+
+    if (window.ReactNativeWebView) {
+      const message = JSON.stringify({
+        type: "sync_cookies",
+        cookies: currentCookies || "No cookies found",
+      });
+      window.ReactNativeWebView.postMessage(message);
+    } else {
+      alert(`Current cookies: ${currentCookies || "No cookies found"}`);
+    }
+  };
 
   if (status === "loading") {
     return (
@@ -48,7 +82,7 @@ export default function EmbeddedPage() {
   }
 
   if (!session) {
-    return null; // Will redirect to login
+    return null;
   }
 
   const goBack = () => {
@@ -58,32 +92,44 @@ export default function EmbeddedPage() {
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-2xl mx-auto">
-        {/* Header optimized for mobile/WebView */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <Badge variant="secondary" className="text-xs">
-              WebView Ready
+              Exercise 2 - Complete
             </Badge>
             <Button onClick={goBack} variant="ghost" size="sm">
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
+          <h1 className="text-2xl font-bold">Cookie Handling Exercise</h1>
           <p className="text-muted-foreground text-sm">
-            Optimized for React Native WebView display
+            Cookie communication between React Native and WebView
           </p>
         </div>
 
-        {/* Main Content Card */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Workshop Content</CardTitle>
+            <CardTitle className="text-lg">Cookie Information</CardTitle>
             <CardDescription>
-              This page is designed to be embedded in a React Native WebView
-              component
+              This page displays and syncs cookies with the React Native app
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Cookie Display */}
+            <div className="p-3 bg-muted rounded-lg">
+              <h3 className="font-semibold text-sm mb-2">🍪 Current Cookies</h3>
+              <div className="bg-white p-2 rounded border text-xs font-mono break-all">
+                {cookies || "No cookies found"}
+              </div>
+            </div>
+
+            {/* Sync Button */}
+            <div className="flex justify-center">
+              <Button onClick={syncCookies} variant="default">
+                Sync Cookies with Native App
+              </Button>
+            </div>
+
             {/* User Info */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
@@ -98,58 +144,41 @@ export default function EmbeddedPage() {
               </div>
             </div>
 
-            {/* WebView Features */}
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">WebView Features</h3>
-              <ul className="text-sm space-y-1 list-disc list-inside">
-                <li>Responsive design for mobile screens</li>
-                <li>Touch-friendly interface elements</li>
-                <li>Minimal navigation for embedded context</li>
-                <li>Authentication state preserved</li>
-              </ul>
-            </div>
-
-            {/* Dashboard role Features */}
+            {/* Dashboard Role */}
             {hasDashboardRole && (
               <div className="p-3 bg-muted rounded-lg">
-                <h3 className="font-semibold text-sm mb-2">
-                  Dashboard user info
-                </h3>
-                <ul className="text-sm space-y-1 list-disc list-inside">
-                  <li>
-                    {hasDashboardRole
-                      ? "You have the dashboard-app-user role."
-                      : "You do NOT have the dashboard-app-user role."}
-                  </li>
-                  <li>
-                    This role allows access to specific dashboard features.
-                  </li>
-                </ul>
+                <h3 className="font-semibold text-sm mb-2">Dashboard Access</h3>
+                <p className="text-sm">✅ You have dashboard-app-user role</p>
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            {/* Cookie Features */}
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-sm mb-2 text-green-900">
+                ✅ Cookie Features Implemented
+              </h3>
+              <ul className="text-sm text-green-800 list-disc list-inside space-y-1">
+                <li>Automatic cookie detection on page load</li>
+                <li>Manual cookie sync with React Native</li>
+                <li>Cookie display in WebView</li>
+                <li>Cookie menu integration in navigation</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-center">
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
-                size="sm"
-                className="flex-1"
               >
-                Refresh Content
-              </Button>
-              <Button onClick={goBack} size="sm" className="flex-1">
-                Return to Dashboard
+                Refresh Page
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Footer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            This page is protected by Keycloak authentication and ready for
-            WebView embedding
+            Exercise 2: Cookie handling implementation completed
           </p>
         </div>
       </div>
