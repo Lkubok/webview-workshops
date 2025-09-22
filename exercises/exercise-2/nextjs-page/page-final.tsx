@@ -48,7 +48,7 @@ export default function EmbeddedPage() {
     if (currentCookies && window.ReactNativeWebView) {
       const message = JSON.stringify({
         type: "cookies",
-        cookies: currentCookies
+        cookies: currentCookies,
       });
       window.ReactNativeWebView.postMessage(message);
     }
@@ -62,7 +62,7 @@ export default function EmbeddedPage() {
     if (window.ReactNativeWebView) {
       const message = JSON.stringify({
         type: "sync_cookies",
-        cookies: currentCookies || "No cookies found"
+        cookies: currentCookies || "No cookies found",
       });
       window.ReactNativeWebView.postMessage(message);
     } else {
@@ -138,7 +138,8 @@ export default function EmbeddedPage() {
                   <strong>Name:</strong> {session.user?.name || "Not provided"}
                 </p>
                 <p>
-                  <strong>Email:</strong> {session.user?.email || "Not provided"}
+                  <strong>Email:</strong>{" "}
+                  {session.user?.email || "Not provided"}
                 </p>
               </div>
             </div>
@@ -147,9 +148,7 @@ export default function EmbeddedPage() {
             {hasDashboardRole && (
               <div className="p-3 bg-muted rounded-lg">
                 <h3 className="font-semibold text-sm mb-2">Dashboard Access</h3>
-                <p className="text-sm">
-                  ✅ You have dashboard-app-user role
-                </p>
+                <p className="text-sm">✅ You have dashboard-app-user role</p>
               </div>
             )}
 
@@ -167,7 +166,10 @@ export default function EmbeddedPage() {
             </div>
 
             <div className="flex justify-center">
-              <Button onClick={() => window.location.reload()} variant="outline">
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
                 Refresh Page
               </Button>
             </div>

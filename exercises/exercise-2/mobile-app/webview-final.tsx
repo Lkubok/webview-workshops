@@ -2,9 +2,17 @@ import React, { useCallback } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
-import { NavigationBar, ErrorDisplay, LoadingOverlay } from "../../components/WebView";
+import {
+  NavigationBar,
+  ErrorDisplay,
+  LoadingOverlay,
+} from "../../components/WebView";
 import { cookieUtils } from "../../utils/cookieManager";
-import { WEBVIEW_URL, injectedJavaScript, webViewProps } from "../../utils/webViewConfig";
+import {
+  WEBVIEW_URL,
+  injectedJavaScript,
+  webViewProps,
+} from "../../utils/webViewConfig";
 
 export default function WebViewScreen() {
   const {
