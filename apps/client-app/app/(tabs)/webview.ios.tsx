@@ -50,7 +50,7 @@ export default function WebViewScreen() {
           break;
         case "counter_updated":
           console.log("Counter updated in webview:", data.counter);
-          Alert.alert("Counter Updated", `Counter is now: ${data.counter}`);
+          // Just log the update, no alert needed when triggered from React Native button
           break;
         default:
           console.log("Unknown message type:", data.type);
@@ -61,19 +61,16 @@ export default function WebViewScreen() {
   }, []);
 
   const handleIncrementCounter = useCallback(() => {
-    // Send message to webview to increment counter
+    // Send message to webview using React Native WebView's built-in postMessage
     const message = JSON.stringify({
       type: "increment_counter",
     });
 
-    // Inject JavaScript to post message to the webview
-    const jsCode = `
-      window.postMessage(${message}, '*');
-      true; // Required for React Native WebView
-    `;
-
-    injectJavaScript(jsCode);
-  }, [injectJavaScript]);
+    // Use WebView's postMessage method for proper React Native → WebView communication
+    if (webViewRef.current) {
+      webViewRef.current.postMessage(message);
+    }
+  }, [webViewRef]);
 
   if (error) {
     return <ErrorDisplay error={error} onRetry={handleRefresh} />;

@@ -43,13 +43,22 @@ export default function EmbeddedPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
+    const handleWindowMessage = (event: MessageEvent) => {
       try {
-        const data = JSON.parse(event.data);
-        console.log("Received message from React Native:", data);
+        // Handle messages sent from React Native WebView's postMessage
+        let messageData;
 
-        if (data.type === "increment_counter") {
-          setCounter(prevCounter => {
+        // React Native WebView sends messages in event.data directly
+        if (typeof event.data === "string") {
+          messageData = JSON.parse(event.data);
+        } else {
+          messageData = event.data;
+        }
+
+        console.log("Received message from React Native:", messageData);
+
+        if (messageData.type === "increment_counter") {
+          setCounter((prevCounter) => {
             const newCounter = prevCounter + 1;
             sendCounterUpdate(newCounter);
             return newCounter;
@@ -57,18 +66,32 @@ export default function EmbeddedPage() {
         }
       } catch (error) {
         console.log("Error parsing message:", error);
+        console.log("Raw event data:", event.data);
       }
     };
 
-    window.addEventListener('message', handleMessage);
+    const handleDocumentMessage = (event: Event) => {
+      // Handle React Native WebView messages that come through document
+      const messageEvent = event as MessageEvent;
+      handleWindowMessage(messageEvent);
+    };
 
-    return () => window.removeEventListener('message', handleMessage);
+    // Listen for messages from React Native WebView
+    window.addEventListener("message", handleWindowMessage);
+
+    // Also listen for the 'message' event on document for React Native WebView compatibility
+    document.addEventListener("message", handleDocumentMessage);
+
+    return () => {
+      window.removeEventListener("message", handleWindowMessage);
+      document.removeEventListener("message", handleDocumentMessage);
+    };
   }, []);
 
   const sendCounterUpdate = (newCounter: number) => {
     const message = JSON.stringify({
       type: "counter_updated",
-      counter: newCounter
+      counter: newCounter,
     });
 
     // Send message back to React Native WebView
@@ -83,6 +106,9 @@ export default function EmbeddedPage() {
     const newCounter = counter + 1;
     setCounter(newCounter);
     sendCounterUpdate(newCounter);
+
+    // Show alert when using local Next.js button
+    alert(`Counter incremented locally to: ${newCounter}`);
   };
 
   if (status === "loading") {
@@ -116,7 +142,9 @@ export default function EmbeddedPage() {
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">Exercise 1: Two-Way Communication</h1>
+          <h1 className="text-2xl font-bold">
+            Exercise 1: Two-Way Communication
+          </h1>
           <p className="text-muted-foreground text-sm">
             Counter controlled from React Native WebView
           </p>
@@ -163,7 +191,8 @@ export default function EmbeddedPage() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 1: Two-way communication implemented between React Native and Next.js
+            Exercise 1: Two-way communication implemented between React Native
+            and Next.js
           </p>
         </div>
       </div>

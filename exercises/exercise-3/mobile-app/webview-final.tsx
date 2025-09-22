@@ -2,9 +2,17 @@ import React, { useCallback } from "react";
 import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
-import { NavigationBar, ErrorDisplay, LoadingOverlay } from "../../components/WebView";
+import {
+  NavigationBar,
+  ErrorDisplay,
+  LoadingOverlay,
+} from "../../components/WebView";
 import { cookieUtils } from "../../utils/cookieManager";
-import { WEBVIEW_URL, injectedJavaScript, webViewProps } from "../../utils/webViewConfig";
+import {
+  WEBVIEW_URL,
+  injectedJavaScript,
+  webViewProps,
+} from "../../utils/webViewConfig";
 
 export default function WebViewScreen() {
   const {
@@ -42,7 +50,7 @@ export default function WebViewScreen() {
           break;
         case "counter_updated":
           console.log("Counter updated in webview:", data.counter);
-          Alert.alert("Counter Updated", `Counter is now: ${data.counter}`);
+          // Just log the update, no alert needed when triggered from React Native button
           break;
         default:
           console.log("Unknown message type:", data.type);
@@ -53,19 +61,16 @@ export default function WebViewScreen() {
   }, []);
 
   const handleIncrementCounter = useCallback(() => {
-    // Send message to webview to increment counter
+    // Send message to webview using React Native WebView's built-in postMessage
     const message = JSON.stringify({
-      type: "increment_counter"
+      type: "increment_counter",
     });
 
-    // Inject JavaScript to post message to the webview
-    const jsCode = `
-      window.postMessage(${message}, '*');
-      true; // Required for React Native WebView
-    `;
-
-    injectJavaScript(jsCode);
-  }, [injectJavaScript]);
+    // Use WebView's postMessage method for proper React Native → WebView communication
+    if (webViewRef.current) {
+      webViewRef.current.postMessage(message);
+    }
+  }, [webViewRef]);
 
   if (error) {
     return <ErrorDisplay error={error} onRetry={handleRefresh} />;
@@ -82,8 +87,13 @@ export default function WebViewScreen() {
         onCookieMenu={handleCookieMenu}
       />
 
-      <TouchableOpacity style={styles.incrementButton} onPress={handleIncrementCounter}>
-        <Text style={styles.incrementButtonText}>Increment Counter in WebView</Text>
+      <TouchableOpacity
+        style={styles.incrementButton}
+        onPress={handleIncrementCounter}
+      >
+        <Text style={styles.incrementButtonText}>
+          Increment Counter in WebView
+        </Text>
       </TouchableOpacity>
 
       <LoadingOverlay visible={loading} />
