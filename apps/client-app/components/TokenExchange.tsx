@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, Alert } from "react-native";
 import { Button } from "./Button";
-import { exchangeToken, TokenExchangeError } from "../utils/tokenExchange";
+import { exchangeToken, exchangeTokenWithoutAudience, TokenExchangeError } from "../utils/tokenExchange";
 import { typography } from "../styles/theme";
 import { decodeJWT } from "../utils/jwt";
 
@@ -22,12 +22,31 @@ export function TokenExchange({ accessToken }: TokenExchangeProps) {
     setLoading(true);
     try {
       console.log("🔄 Starting token exchange for device-dashboard...");
+      console.log("📋 Current token audience check - look at your token display below");
 
-      const newToken = await exchangeToken({
-        currentToken: accessToken,
-        audience: "device-dashboard",
-        clientId: "token-exchange-service"
-      });
+      // First try with audience
+      let newToken;
+      try {
+        newToken = await exchangeToken({
+          currentToken: accessToken,
+          audience: "device-dashboard",
+          clientId: "token-exchange-service"
+        });
+      } catch (audienceError) {
+        console.log("⚠️ Device-dashboard audience failed, trying with client-app audience...");
+        try {
+          // Try with the original token's client (client-app)
+          newToken = await exchangeToken({
+            currentToken: accessToken,
+            audience: "client-app", // Same as token's azp field
+            clientId: "token-exchange-service"
+          });
+        } catch (clientAppError) {
+          console.log("⚠️ Client-app audience failed, trying without audience parameter...");
+          // Try without audience parameter at all
+          newToken = await exchangeTokenWithoutAudience(accessToken);
+        }
+      }
 
       setExchangedToken(newToken);
 

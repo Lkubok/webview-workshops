@@ -11,6 +11,9 @@ interface TokenDisplayProps {
 export function TokenDisplay({ accessToken }: TokenDisplayProps) {
   const decodedToken = decodeJWT(accessToken);
 
+  console.log("Decoded Access Token: ");
+  console.log(decodedToken);
+
   return (
     <View
       style={{
