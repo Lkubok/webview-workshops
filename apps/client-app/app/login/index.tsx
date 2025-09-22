@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-  Image,
-} from "react-native";
+import { View, Text, Alert } from "react-native";
 import { useAuth } from "../../contexts/AuthContext";
+import { Button } from "../../components";
+import { useConnectionTest } from "../../hooks";
+import { commonStyles, typography, spacing } from "../../styles/theme";
 
 export default function LoginScreen() {
   const { login } = useAuth();
   const [isLogging, setIsLogging] = useState(false);
+  const { testConnection } = useConnectionTest();
 
   const handleLogin = async () => {
     try {
@@ -30,106 +26,36 @@ export default function LoginScreen() {
     }
   };
 
-  const testConnection = async () => {
-    try {
-      const response = await fetch("http://192.168.233.174:4000/health");
-      const data = await response.json();
-      alert(`Success: ${JSON.stringify(data)}`);
-    } catch (error) {
-      if (error instanceof Error) {
-        alert(`Failed: ${error.message}`);
-      } else {
-        alert(`Failed: ${String(error)}`);
-      }
-    }
-  };
-
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+    <View style={[commonStyles.container, commonStyles.center]}>
+      <View style={commonStyles.content}>
+        <View style={{ alignItems: 'center', marginBottom: 60 }}>
+          <Text style={[typography.title, { marginBottom: spacing.sm }]}>
+            Welcome
+          </Text>
+          <Text style={[typography.bodySecondary, commonStyles.textCenter]}>
+            Sign in to continue
+          </Text>
         </View>
 
-        <TouchableOpacity
-          style={[styles.loginButton, isLogging && styles.loginButtonDisabled]}
+        <Button
+          title="Sign in with Keycloak"
           onPress={handleLogin}
-          disabled={isLogging}
-        >
-          {isLogging ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.loginButtonText}>Sign in with Keycloak</Text>
-          )}
-        </TouchableOpacity>
+          loading={isLogging}
+          style={{ marginBottom: spacing.xl }}
+        />
 
-        <Text style={styles.infoText}>
+        <Text style={[typography.caption, commonStyles.textCenter, { lineHeight: 20, marginBottom: spacing.lg }]}>
           You will be redirected to Keycloak to sign in securely.
         </Text>
-        <TouchableOpacity onPress={testConnection}>
-          <Text>Test Connection</Text>
-        </TouchableOpacity>
+
+        <Button
+          title="Test Connection"
+          onPress={testConnection}
+          variant="ghost"
+          size="small"
+        />
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 40,
-  },
-  header: {
-    alignItems: "center",
-    marginBottom: 60,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-    textAlign: "center",
-  },
-  loginButton: {
-    backgroundColor: "#007AFF",
-    paddingHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 8,
-    minWidth: 200,
-    alignItems: "center",
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  loginButtonDisabled: {
-    backgroundColor: "#A0A0A0",
-  },
-  loginButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  infoText: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-});

@@ -11,23 +11,8 @@ import Constants from "expo-constants";
 import StorageUtils from "./StorageUtils";
 import { performCompleteLogout } from "./keycloakUtils";
 import { KEYCLOAK_CONFIG } from "./authConfig";
-
-interface User {
-  sub: string;
-  preferred_username?: string;
-  email?: string;
-  name?: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  isLoading: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  refreshToken: () => Promise<void>;
-  accessToken: string | null;
-  refreshTokenValue: string | null;
-}
+import { exchangeTokenWithFallback } from "../utils/tokenExchange";
+import { User, AuthContextType, TokenData } from "../types/auth";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -75,7 +60,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     []
   );
 
-  const storeTokens = useCallback(async (tokens: any) => {
+  const exchangeTokenForDeviceDashboard = useCallback(async (currentToken: string): Promise<string> => {
+    return await exchangeTokenWithFallback(currentToken, 'device-dashboard');
+  }, []);
+
+  const storeTokens = useCallback(async (tokens: TokenData) => {
     await StorageUtils.setItem("access_token", tokens.access_token);
     if (tokens.refresh_token)
       await StorageUtils.setItem("refresh_token", tokens.refresh_token);
@@ -326,6 +315,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         refreshToken,
         accessToken,
         refreshTokenValue,
+        exchangeTokenForDeviceDashboard,
       }}
     >
       {children}
