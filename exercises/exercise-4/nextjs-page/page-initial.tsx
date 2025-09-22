@@ -24,8 +24,6 @@ export default function EmbeddedPage() {
     "device-dashboard",
     "dashboard-app-user"
   );
-
-  // TODO: Add state for token from hash params
   const [receivedToken, setReceivedToken] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,20 +33,9 @@ export default function EmbeddedPage() {
     }
   }, [session, status, router]);
 
-  // TODO: Add useEffect to extract token from hash params
-  useEffect(() => {
-    // TODO: Check if window.location.hash contains token
-    // TODO: Extract token from hash params (e.g., #token=abc123)
-    // TODO: Update receivedToken state
-    // TODO: Optionally clean up the hash from URL
-  }, []);
+  useEffect(() => {}, []);
 
-  // TODO: Add function to request token refresh from React Native
-  const requestTokenRefresh = () => {
-    // TODO: Send message to React Native requesting token refresh
-    // Use window.ReactNativeWebView?.postMessage() if available
-    // Send message with type "refresh_token_request"
-  };
+  const requestTokenRefresh = () => {};
 
   if (status === "loading") {
     return (
@@ -95,7 +82,6 @@ export default function EmbeddedPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Token Display */}
             <div className="p-6 bg-muted rounded-lg">
               <h3 className="font-semibold mb-2">Received Token:</h3>
               {receivedToken ? (
@@ -104,12 +90,12 @@ export default function EmbeddedPage() {
                 </div>
               ) : (
                 <div className="text-muted-foreground italic">
-                  No token received yet. Use "Send Initial Token" button in the React Native app.
+                  No token received yet. Use "Send Initial Token" button in the
+                  React Native app.
                 </div>
               )}
             </div>
 
-            {/* Token Refresh Button */}
             <div className="flex justify-center">
               <Button
                 onClick={requestTokenRefresh}
@@ -120,9 +106,10 @@ export default function EmbeddedPage() {
               </Button>
             </div>
 
-            {/* Instructions */}
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <h3 className="font-semibold text-sm mb-2 text-blue-900">Instructions:</h3>
+              <h3 className="font-semibold text-sm mb-2 text-blue-900">
+                Instructions:
+              </h3>
               <ol className="text-sm space-y-1 list-decimal list-inside text-blue-800">
                 <li>Use "Send Initial Token" button in React Native app</li>
                 <li>Token should appear above</li>
@@ -131,7 +118,6 @@ export default function EmbeddedPage() {
               </ol>
             </div>
 
-            {/* User Info */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
               <div className="text-sm space-y-1">
@@ -149,7 +135,8 @@ export default function EmbeddedPage() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 2: Implement token exchange between React Native and Next.js
+            Exercise 4: Implement token exchange between React Native and
+            Next.js
           </p>
         </div>
       </div>

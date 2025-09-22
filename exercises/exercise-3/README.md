@@ -1,55 +1,64 @@
-# Exercise 3: Two-Way Communication Bridge
+# Exercise 3: Cookie Handling and Communication
 
 ## Goal
 
-Create a two-way communication bridge between a React Native WebView and a Next.js application.
+Implement cookie handling and communication between React Native WebView and Next.js application.
 
 ## Scenario
 
-- There should be a native button above the WebView component in the React Native app
-- When this button is pressed, it should increment a counter in the Next.js page
-- The counter should be managed as React state in the Next.js application
-- The Next.js page should send confirmation back to React Native when the counter is updated
+- Start with a basic WebView (similar to Exercise 1 final state)
+- Add cookie management functionality
+- Enable cookie synchronization between React Native and WebView
+- Display cookie information in both React Native alerts and Next.js page
 
 ## Files Structure
 
 ```
-exercise-1/
+exercise-2/
 ├── mobile-app/
-│   ├── webview-initial.tsx    # Starting point with TODOs
-│   └── webview-final.tsx      # Complete implementation
+│   ├── webview-initial.tsx    # Basic WebView without cookie handling
+│   └── webview-final.tsx      # Complete implementation with cookies
 ├── nextjs-page/
-│   ├── page-initial.tsx       # Starting point with TODOs
-│   └── page-final.tsx         # Complete implementation
+│   ├── page-initial.tsx       # Basic page without cookie display
+│   └── page-final.tsx         # Complete page with cookie functionality
 └── README.md                  # This file
 ```
 
-## Tasks to Complete
-
-### Mobile App (React Native) - `webview-initial.tsx`
-
-1. **Implement `handleMessage`**: Add case for "counter_updated" message type
-2. **Implement `handleIncrementCounter`**: Send message to webview to increment counter
-3. **Message Format**: Use JSON with `type: "increment_counter"`
-
-### Next.js Page - `page-initial.tsx`
-
-1. **Add counter state**: Initialize with `useState(0)`
-2. **Add message listener**: Listen for "message" events from React Native
-3. **Handle increment message**: Parse message and increment counter when type is "increment_counter"
-4. **Send confirmation**: Use `window.ReactNativeWebView?.postMessage()` to send counter updates back
-5. **Message Format**: Send JSON with `type: "counter_updated"` and counter value
-
 ## Key Concepts
 
-- **React Native → Next.js**: Use `injectJavaScript()` to send messages
-- **Next.js → React Native**: Use `window.ReactNativeWebView.postMessage()`
-- **Message Format**: Always use JSON strings for structured communication
-- **Event Listeners**: Next.js listens to 'message' events from the parent window
+### Message Communication
 
-## Expected Behavior
+- **React Native → Next.js**: Via injected JavaScript and message events
+- **Next.js → React Native**: Via `window.ReactNativeWebView.postMessage()`
+- **Message Types**: Structured communication with type field
+- **JSON Serialization**: All messages must be JSON strings
 
-1. User taps "Increment Counter in WebView" button in React Native
-2. Counter in Next.js page increments by 1
-3. Next.js sends confirmation message back to React Native
-4. React Native shows alert with updated counter value
+### Cookie Flow
+
+1. **Page Load**: Next.js detects cookies and sends to React Native
+2. **Cookie Menu**: React Native provides cookie management interface
+3. **Manual Sync**: User can trigger cookie synchronization
+4. **Display**: Cookies are displayed in both React Native alerts and Next.js page
+
+## Implementation Steps
+
+1. **Start with React Native**: Add cookie imports and handlers
+2. **Add message handling**: Implement bidirectional communication
+3. **Update NavigationBar**: Add cookie menu functionality
+4. **Implement Next.js side**: Add cookie detection and display
+5. **Add sync functionality**: Enable manual cookie synchronization
+6. **Test cookie flow**: Verify complete cookie management
+
+## Common Issues
+
+- **No cookies detected**: Check if the website sets cookies
+- **Message not received**: Verify `onMessage` prop is added to WebView
+- **Alert not showing**: Check Alert import and message parsing
+- **Cookie menu not working**: Verify cookieUtils import and function call
+
+## Security Notes
+
+- Cookies may contain sensitive information
+- Always validate and sanitize cookie data
+- Consider cookie scope and security flags
+- Test with real authentication cookies

@@ -2,9 +2,17 @@ import React, { useCallback, useState } from "react";
 import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
-import { NavigationBar, ErrorDisplay, LoadingOverlay } from "../../components/WebView";
+import {
+  NavigationBar,
+  ErrorDisplay,
+  LoadingOverlay,
+} from "../../components/WebView";
 import { cookieUtils } from "../../utils/cookieManager";
-import { WEBVIEW_URL, injectedJavaScript, webViewProps } from "../../utils/webViewConfig";
+import {
+  WEBVIEW_URL,
+  injectedJavaScript,
+  webViewProps,
+} from "../../utils/webViewConfig";
 
 export default function WebViewScreen() {
   const {
@@ -30,7 +38,6 @@ export default function WebViewScreen() {
   }, [injectJavaScript, handleRefresh]);
 
   const generateNewToken = useCallback(() => {
-    // Simulate API call to generate new token
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
     return `token-${timestamp}-${randomString}`;
@@ -62,34 +69,33 @@ export default function WebViewScreen() {
   }, []);
 
   const refreshToken = useCallback(() => {
-    // Generate new token (simulate API call)
     const newToken = generateNewToken();
     setCurrentToken(newToken);
-
-    // Navigate webview to URL with new token in hash params
     const urlWithToken = `${WEBVIEW_URL}#token=${encodeURIComponent(newToken)}`;
 
     if (webViewRef.current) {
-      webViewRef.current.postMessage(JSON.stringify({
-        type: "navigate",
-        url: urlWithToken
-      }));
+      webViewRef.current.postMessage(
+        JSON.stringify({
+          type: "navigate",
+          url: urlWithToken,
+        })
+      );
 
-      // Also directly navigate
       webViewRef.current.injectJavaScript(`
         window.location.href = "${urlWithToken}";
         true;
       `);
     }
 
-    Alert.alert("Token Refreshed", `New token generated: ${newToken.substring(0, 20)}...`);
+    Alert.alert(
+      "Token Refreshed",
+      `New token generated: ${newToken.substring(0, 20)}...`
+    );
   }, [generateNewToken, webViewRef]);
 
   const sendInitialToken = useCallback(() => {
-    // Construct URL with token in hash params
     const urlWithToken = `${WEBVIEW_URL}#token=${encodeURIComponent(currentToken)}`;
 
-    // Navigate webview to the URL with token
     if (webViewRef.current) {
       webViewRef.current.injectJavaScript(`
         window.location.href = "${urlWithToken}";
@@ -97,7 +103,10 @@ export default function WebViewScreen() {
       `);
     }
 
-    Alert.alert("Token Sent", `Initial token sent: ${currentToken.substring(0, 20)}...`);
+    Alert.alert(
+      "Token Sent",
+      `Initial token sent: ${currentToken.substring(0, 20)}...`
+    );
   }, [currentToken, webViewRef]);
 
   if (error) {
@@ -119,7 +128,6 @@ export default function WebViewScreen() {
         <Text style={styles.tokenButtonText}>Send Initial Token</Text>
       </TouchableOpacity>
 
-      {/* Current token display */}
       <View style={styles.tokenDisplay}>
         <Text style={styles.tokenLabel}>Current Token:</Text>
         <Text style={styles.tokenValue}>{currentToken}</Text>

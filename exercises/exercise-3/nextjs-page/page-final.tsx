@@ -33,7 +33,7 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  const [counter, setCounter] = useState(0);
+  const [cookies, setCookies] = useState<string>("");
 
   useEffect(() => {
     if (status === "loading") return;
@@ -43,72 +43,31 @@ export default function EmbeddedPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    const handleWindowMessage = (event: MessageEvent) => {
-      try {
-        // Handle messages sent from React Native WebView's postMessage
-        let messageData;
-
-        // React Native WebView sends messages in event.data directly
-        if (typeof event.data === "string") {
-          messageData = JSON.parse(event.data);
-        } else {
-          messageData = event.data;
-        }
-
-        console.log("Received message from React Native:", messageData);
-
-        if (messageData.type === "increment_counter") {
-          setCounter((prevCounter) => {
-            const newCounter = prevCounter + 1;
-            sendCounterUpdate(newCounter);
-            return newCounter;
-          });
-        }
-      } catch (error) {
-        console.log("Error parsing message:", error);
-        console.log("Raw event data:", event.data);
-      }
-    };
-
-    const handleDocumentMessage = (event: Event) => {
-      // Handle React Native WebView messages that come through document
-      const messageEvent = event as MessageEvent;
-      handleWindowMessage(messageEvent);
-    };
-
-    // Listen for messages from React Native WebView
-    window.addEventListener("message", handleWindowMessage);
-
-    // Also listen for the 'message' event on document for React Native WebView compatibility
-    document.addEventListener("message", handleDocumentMessage);
-
-    return () => {
-      window.removeEventListener("message", handleWindowMessage);
-      document.removeEventListener("message", handleDocumentMessage);
-    };
+    // Send current cookies to React Native on page load
+    const currentCookies = document.cookie;
+    if (currentCookies && window.ReactNativeWebView) {
+      const message = JSON.stringify({
+        type: "cookies",
+        cookies: currentCookies,
+      });
+      window.ReactNativeWebView.postMessage(message);
+    }
+    setCookies(currentCookies);
   }, []);
 
-  const sendCounterUpdate = (newCounter: number) => {
-    const message = JSON.stringify({
-      type: "counter_updated",
-      counter: newCounter,
-    });
+  const syncCookies = () => {
+    const currentCookies = document.cookie;
+    setCookies(currentCookies);
 
-    // Send message back to React Native WebView
     if (window.ReactNativeWebView) {
+      const message = JSON.stringify({
+        type: "sync_cookies",
+        cookies: currentCookies || "No cookies found",
+      });
       window.ReactNativeWebView.postMessage(message);
     } else {
-      console.log("ReactNativeWebView not available");
+      alert(`Current cookies: ${currentCookies || "No cookies found"}`);
     }
-  };
-
-  const incrementCounter = () => {
-    const newCounter = counter + 1;
-    setCounter(newCounter);
-    sendCounterUpdate(newCounter);
-
-    // Show alert when using local Next.js button
-    alert(`Counter incremented locally to: ${newCounter}`);
   };
 
   if (status === "loading") {
@@ -136,40 +95,38 @@ export default function EmbeddedPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <Badge variant="secondary" className="text-xs">
-              WebView Ready
+              Exercise 3 - Complete
             </Badge>
             <Button onClick={goBack} variant="ghost" size="sm">
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">
-            Exercise 1: Two-Way Communication
-          </h1>
+          <h1 className="text-2xl font-bold">Cookie Handling Exercise</h1>
           <p className="text-muted-foreground text-sm">
-            Counter controlled from React Native WebView
+            Cookie communication between React Native and WebView
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Counter Component</CardTitle>
+            <CardTitle className="text-lg">Cookie Information</CardTitle>
             <CardDescription>
-              This counter can be incremented from the React Native app
+              This page displays and syncs cookies with the React Native app
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Counter Display */}
-            <div className="text-center p-6 bg-muted rounded-lg">
-              <h2 className="text-3xl font-bold mb-2">Counter: {counter}</h2>
-              <p className="text-sm text-muted-foreground">
-                Use the button in the React Native app to increment this counter
-              </p>
+            {/* Cookie Display */}
+            <div className="p-3 bg-muted rounded-lg">
+              <h3 className="font-semibold text-sm mb-2">🍪 Current Cookies</h3>
+              <div className="bg-white p-2 rounded border text-xs font-mono break-all">
+                {cookies || "No cookies found"}
+              </div>
             </div>
 
-            {/* Local increment button for testing */}
+            {/* Sync Button */}
             <div className="flex justify-center">
-              <Button onClick={incrementCounter} variant="outline">
-                Local Increment (for testing)
+              <Button onClick={syncCookies} variant="default">
+                Sync Cookies with Native App
               </Button>
             </div>
 
@@ -186,13 +143,42 @@ export default function EmbeddedPage() {
                 </p>
               </div>
             </div>
+
+            {/* Dashboard Role */}
+            {hasDashboardRole && (
+              <div className="p-3 bg-muted rounded-lg">
+                <h3 className="font-semibold text-sm mb-2">Dashboard Access</h3>
+                <p className="text-sm">✅ You have dashboard-app-user role</p>
+              </div>
+            )}
+
+            {/* Cookie Features */}
+            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-sm mb-2 text-green-900">
+                ✅ Cookie Features Implemented
+              </h3>
+              <ul className="text-sm text-green-800 list-disc list-inside space-y-1">
+                <li>Automatic cookie detection on page load</li>
+                <li>Manual cookie sync with React Native</li>
+                <li>Cookie display in WebView</li>
+                <li>Cookie menu integration in navigation</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Refresh Page
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 1: Two-way communication implemented between React Native
-            and Next.js
+            Exercise 3: Cookie handling implementation completed
           </p>
         </div>
       </div>

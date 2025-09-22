@@ -43,41 +43,35 @@ export default function EmbeddedPage() {
   }, [session, status, router]);
 
   useEffect(() => {
-    // Extract token from hash params
     const extractTokenFromHash = () => {
       const hash = window.location.hash;
       if (hash) {
         const params = new URLSearchParams(hash.substring(1)); // Remove # and parse
-        const token = params.get('token');
+        const token = params.get("token");
         if (token) {
           setReceivedToken(decodeURIComponent(token));
-          // Optionally clean up the hash from URL
-          window.history.replaceState(null, '', window.location.pathname);
+          window.history.replaceState(null, "", window.location.pathname);
         }
       }
     };
 
-    // Extract token on initial load
     extractTokenFromHash();
 
-    // Listen for hash changes (in case token is updated)
     const handleHashChange = () => {
       extractTokenFromHash();
     };
 
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener("hashchange", handleHashChange);
 
-    // Also listen for navigation messages from React Native
     const handleMessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
         if (data.type === "navigate" && data.url) {
-          // Extract token from the new URL
           const url = new URL(data.url);
           const hash = url.hash;
           if (hash) {
             const params = new URLSearchParams(hash.substring(1));
-            const token = params.get('token');
+            const token = params.get("token");
             if (token) {
               setReceivedToken(decodeURIComponent(token));
             }
@@ -88,20 +82,19 @@ export default function EmbeddedPage() {
       }
     };
 
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
 
     return () => {
-      window.removeEventListener('hashchange', handleHashChange);
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("hashchange", handleHashChange);
+      window.removeEventListener("message", handleMessage);
     };
   }, []);
 
   const requestTokenRefresh = () => {
     const message = JSON.stringify({
-      type: "refresh_token_request"
+      type: "refresh_token_request",
     });
 
-    // Send message to React Native requesting token refresh
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView.postMessage(message);
     } else {
@@ -155,7 +148,6 @@ export default function EmbeddedPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Token Display */}
             <div className="p-6 bg-muted rounded-lg">
               <h3 className="font-semibold mb-2">Received Token:</h3>
               {receivedToken ? (
@@ -164,12 +156,12 @@ export default function EmbeddedPage() {
                 </div>
               ) : (
                 <div className="text-muted-foreground italic">
-                  No token received yet. Use "Send Initial Token" button in the React Native app.
+                  No token received yet. Use "Send Initial Token" button in the
+                  React Native app.
                 </div>
               )}
             </div>
 
-            {/* Token Refresh Button */}
             <div className="flex justify-center">
               <Button
                 onClick={requestTokenRefresh}
@@ -180,9 +172,10 @@ export default function EmbeddedPage() {
               </Button>
             </div>
 
-            {/* Instructions */}
             <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <h3 className="font-semibold text-sm mb-2 text-green-900">✅ Implementation Complete:</h3>
+              <h3 className="font-semibold text-sm mb-2 text-green-900">
+                ✅ Implementation Complete:
+              </h3>
               <ol className="text-sm space-y-1 list-decimal list-inside text-green-800">
                 <li>Token extraction from hash params implemented</li>
                 <li>Token display working</li>
@@ -191,7 +184,6 @@ export default function EmbeddedPage() {
               </ol>
             </div>
 
-            {/* User Info */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
               <div className="text-sm space-y-1">
@@ -209,7 +201,8 @@ export default function EmbeddedPage() {
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 2: Token exchange implemented between React Native and Next.js
+            Exercise 2: Token exchange implemented between React Native and
+            Next.js
           </p>
         </div>
       </div>

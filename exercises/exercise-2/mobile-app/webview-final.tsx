@@ -1,13 +1,8 @@
 import React, { useCallback } from "react";
-import { View, StyleSheet, Alert } from "react-native";
+import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
-import {
-  NavigationBar,
-  ErrorDisplay,
-  LoadingOverlay,
-} from "../../components/WebView";
-import { cookieUtils } from "../../utils/cookieManager";
+import { ErrorDisplay, LoadingOverlay } from "../../components/WebView";
 import {
   WEBVIEW_URL,
   injectedJavaScript,
@@ -19,21 +14,12 @@ export default function WebViewScreen() {
     webViewRef,
     loading,
     error,
-    canGoBack,
-    canGoForward,
     handleNavigationStateChange,
     handleLoadStart,
     handleLoadEnd,
     handleError,
     handleRefresh,
-    handleGoBack,
-    handleGoForward,
-    injectJavaScript,
   } = useWebView();
-
-  const handleCookieMenu = useCallback(() => {
-    cookieUtils.showCookieMenu(injectJavaScript, handleRefresh);
-  }, [injectJavaScript, handleRefresh]);
 
   const handleMessage = useCallback((event: any) => {
     try {
@@ -48,6 +34,9 @@ export default function WebViewScreen() {
           console.log("Syncing cookies:", data.cookies);
           Alert.alert("WebView Cookies", data.cookies || "No cookies found");
           break;
+        case "counter_updated":
+          console.log("Counter updated in webview:", data.counter);
+          break;
         default:
           console.log("Unknown message type:", data.type);
       }
@@ -56,20 +45,30 @@ export default function WebViewScreen() {
     }
   }, []);
 
+  const handleIncrementCounter = useCallback(() => {
+    const message = JSON.stringify({
+      type: "increment_counter",
+    });
+
+    if (webViewRef.current) {
+      webViewRef.current.postMessage(message);
+    }
+  }, [webViewRef]);
+
   if (error) {
     return <ErrorDisplay error={error} onRetry={handleRefresh} />;
   }
 
   return (
     <View style={styles.container}>
-      <NavigationBar
-        canGoBack={canGoBack}
-        canGoForward={canGoForward}
-        onGoBack={handleGoBack}
-        onGoForward={handleGoForward}
-        onRefresh={handleRefresh}
-        onCookieMenu={handleCookieMenu}
-      />
+      <TouchableOpacity
+        style={styles.incrementButton}
+        onPress={handleIncrementCounter}
+      >
+        <Text style={styles.incrementButtonText}>
+          Increment Counter in WebView
+        </Text>
+      </TouchableOpacity>
 
       <LoadingOverlay visible={loading} />
 
@@ -96,5 +95,17 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  incrementButton: {
+    backgroundColor: "#007AFF",
+    padding: 15,
+    margin: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  incrementButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

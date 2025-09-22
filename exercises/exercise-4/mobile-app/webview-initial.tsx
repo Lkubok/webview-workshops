@@ -2,9 +2,17 @@ import React, { useCallback, useState } from "react";
 import { View, StyleSheet, Alert, TouchableOpacity, Text } from "react-native";
 import { WebView } from "react-native-webview";
 import { useWebView } from "../../hooks/useWebView";
-import { NavigationBar, ErrorDisplay, LoadingOverlay } from "../../components/WebView";
+import {
+  NavigationBar,
+  ErrorDisplay,
+  LoadingOverlay,
+} from "../../components/WebView";
 import { cookieUtils } from "../../utils/cookieManager";
-import { WEBVIEW_URL, injectedJavaScript, webViewProps } from "../../utils/webViewConfig";
+import {
+  WEBVIEW_URL,
+  injectedJavaScript,
+  webViewProps,
+} from "../../utils/webViewConfig";
 
 export default function WebViewScreen() {
   const {
@@ -23,7 +31,6 @@ export default function WebViewScreen() {
     injectJavaScript,
   } = useWebView();
 
-  // TODO: Add state to manage current token
   const [currentToken, setCurrentToken] = useState("initial-token-12345");
 
   const handleCookieMenu = useCallback(() => {
@@ -43,7 +50,6 @@ export default function WebViewScreen() {
           console.log("Syncing cookies:", data.cookies);
           Alert.alert("WebView Cookies", data.cookies || "No cookies found");
           break;
-        // TODO: Add case for "refresh_token_request" to handle token refresh requests from webview
         default:
           console.log("Unknown message type:", data.type);
       }
@@ -52,18 +58,9 @@ export default function WebViewScreen() {
     }
   }, []);
 
-  // TODO: Implement function to generate new token and send it to webview
-  const refreshToken = useCallback(() => {
-    // TODO: Generate new token (simulate API call)
-    // TODO: Update currentToken state
-    // TODO: Navigate webview to URL with new token in hash params
-  }, []);
+  const refreshToken = useCallback(() => {}, []);
 
-  // TODO: Implement function to send initial token to webview on load
-  const sendInitialToken = useCallback(() => {
-    // TODO: Construct URL with token in hash params
-    // TODO: Navigate webview to the URL with token
-  }, [currentToken]);
+  const sendInitialToken = useCallback(() => {}, [currentToken]);
 
   if (error) {
     return <ErrorDisplay error={error} onRetry={handleRefresh} />;
@@ -80,12 +77,10 @@ export default function WebViewScreen() {
         onCookieMenu={handleCookieMenu}
       />
 
-      {/* TODO: Add button to send initial token */}
       <TouchableOpacity style={styles.tokenButton} onPress={sendInitialToken}>
         <Text style={styles.tokenButtonText}>Send Initial Token</Text>
       </TouchableOpacity>
 
-      {/* Current token display */}
       <View style={styles.tokenDisplay}>
         <Text style={styles.tokenLabel}>Current Token:</Text>
         <Text style={styles.tokenValue}>{currentToken}</Text>

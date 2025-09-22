@@ -16,8 +16,10 @@ import { useHasRole } from "@/hooks/useRole";
 
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
+  console.log("NEXTJS access token");
   const accessToken = (session as typeof session & { accessToken?: string })
     ?.accessToken;
+  console.log(accessToken);
   const router = useRouter();
   const hasDashboardRole = useHasRole(
     accessToken,
@@ -25,8 +27,7 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  // TODO: Add state for counter
-  const [counter, setCounter] = useState(0);
+  console.log("Has dashboard role:", hasDashboardRole);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -34,38 +35,6 @@ export default function EmbeddedPage() {
       router.push("/login");
     }
   }, [session, status, router]);
-
-  // TODO: Add useEffect to listen for messages from React Native WebView
-  useEffect(() => {
-    // TODO: Add event listener for messages from React Native
-    // Listen for 'message' events from the parent (React Native WebView)
-    // Handle increment_counter message type
-
-    const handleMessage = (event: MessageEvent) => {
-      // TODO: Parse message data and handle increment_counter type
-      // Update counter state when receiving increment message
-    };
-
-    // TODO: Add event listener
-    // window.addEventListener('message', handleMessage);
-
-    // TODO: Return cleanup function
-    // return () => window.removeEventListener('message', handleMessage);
-  }, []);
-
-  // TODO: Add function to send counter updates back to React Native
-  const sendCounterUpdate = (newCounter: number) => {
-    // TODO: Send message back to React Native WebView
-    // Use window.ReactNativeWebView?.postMessage() if available
-    // Send message with type "counter_updated" and the new counter value
-  };
-
-  // TODO: Update increment function to also send message to React Native
-  const incrementCounter = () => {
-    const newCounter = counter + 1;
-    setCounter(newCounter);
-    // TODO: Call sendCounterUpdate with new counter value
-  };
 
   if (status === "loading") {
     return (
@@ -98,36 +67,21 @@ export default function EmbeddedPage() {
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">Exercise 1: Two-Way Communication</h1>
+          <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
           <p className="text-muted-foreground text-sm">
-            Counter controlled from React Native WebView
+            Optimized for React Native WebView display
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Counter Component</CardTitle>
+            <CardTitle className="text-lg">Workshop Content</CardTitle>
             <CardDescription>
-              This counter can be incremented from the React Native app
+              This page is designed to be embedded in a React Native WebView
+              component
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Counter Display */}
-            <div className="text-center p-6 bg-muted rounded-lg">
-              <h2 className="text-3xl font-bold mb-2">Counter: {counter}</h2>
-              <p className="text-sm text-muted-foreground">
-                Use the button in the React Native app to increment this counter
-              </p>
-            </div>
-
-            {/* Local increment button for testing */}
-            <div className="flex justify-center">
-              <Button onClick={incrementCounter} variant="outline">
-                Local Increment (for testing)
-              </Button>
-            </div>
-
-            {/* User Info */}
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
               <div className="text-sm space-y-1">
@@ -140,12 +94,55 @@ export default function EmbeddedPage() {
                 </p>
               </div>
             </div>
+
+            <div className="p-3 bg-muted rounded-lg">
+              <h3 className="font-semibold text-sm mb-2">WebView Features</h3>
+              <ul className="text-sm space-y-1 list-disc list-inside">
+                <li>Responsive design for mobile screens</li>
+                <li>Touch-friendly interface elements</li>
+                <li>Minimal navigation for embedded context</li>
+                <li>Authentication state preserved</li>
+              </ul>
+            </div>
+
+            {hasDashboardRole && (
+              <div className="p-3 bg-muted rounded-lg">
+                <h3 className="font-semibold text-sm mb-2">
+                  Dashboard user info
+                </h3>
+                <ul className="text-sm space-y-1 list-disc list-inside">
+                  <li>
+                    {hasDashboardRole
+                      ? "You have the dashboard-app-user role."
+                      : "You do NOT have the dashboard-app-user role."}
+                  </li>
+                  <li>
+                    This role allows access to specific dashboard features.
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                Refresh Content
+              </Button>
+              <Button onClick={goBack} size="sm" className="flex-1">
+                Return to Dashboard
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            Exercise 1: Implement two-way communication between React Native and Next.js
+            This page is protected by Keycloak authentication and ready for
+            WebView embedding
           </p>
         </div>
       </div>
