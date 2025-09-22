@@ -53,10 +53,3 @@ exercise-1/
 2. Counter in Next.js page increments by 1
 3. Next.js sends confirmation message back to React Native
 4. React Native shows alert with updated counter value
-
-## Testing
-
-1. Start with `webview-initial.tsx` and `page-initial.tsx`
-2. Implement the TODOs step by step
-3. Test the communication flow
-4. Compare with final versions if needed
