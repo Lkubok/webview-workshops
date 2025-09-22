@@ -1,39 +1,17 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
-import { WebView } from "react-native-webview";
-import { useWebView } from "../../hooks/useWebView";
-import { LoadingOverlay } from "../../components/WebView";
-import {
-  WEBVIEW_URL,
-  injectedJavaScript,
-  webViewProps,
-} from "../../utils/webViewConfig";
+import { View, StyleSheet, Text } from "react-native";
 
 export default function WebViewScreen() {
-  const {
-    webViewRef,
-    loading,
-    handleNavigationStateChange,
-    handleLoadStart,
-    handleLoadEnd,
-    handleError,
-  } = useWebView();
-
   return (
     <View style={styles.container}>
-      <LoadingOverlay visible={loading} />
-
-      <WebView
-        ref={webViewRef}
-        source={{ uri: WEBVIEW_URL }}
-        style={styles.webview}
-        onNavigationStateChange={handleNavigationStateChange}
-        onLoadStart={handleLoadStart}
-        onLoadEnd={handleLoadEnd}
-        onError={handleError}
-        injectedJavaScript={injectedJavaScript}
-        {...webViewProps}
-      />
+      <View style={styles.placeholder}>
+        <Text style={styles.placeholderText}>
+          WebView will be displayed here
+        </Text>
+        <Text style={styles.instructions}>
+          Follow the TODOs to implement the WebView component
+        </Text>
+      </View>
     </View>
   );
 }
@@ -45,5 +23,24 @@ const styles = StyleSheet.create({
   },
   webview: {
     flex: 1,
+  },
+  placeholder: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  placeholderText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#666",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  instructions: {
+    fontSize: 14,
+    color: "#999",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });

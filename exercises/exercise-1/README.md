@@ -4,6 +4,8 @@
 
 Learn the fundamentals of setting up a React Native WebView component to display a Next.js application.
 
+Display site under address: device-dashboard.localhost:3010/embedded
+
 ## Scenario
 
 - Start with an empty screen showing placeholder content
