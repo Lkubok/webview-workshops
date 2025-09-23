@@ -24,9 +24,8 @@
 ## 1. Our Approach to Loyalty App Integration (10 min) 9:20–9:30
 
 - Present the integration of our loyalty app with myVaillant Pro service app
-- Show exchange token solution on the IDM (Keycloak) side
-- Explain authentication flow: mobile app → WebView → Keycloak
-- Discuss challenges and how we solved them
+- Explain authentication flow: mobile app → WebView → Keycloak // show diagram
+- Discuss challenges and how we solved them // hash params / two way communication / webview with token exchange
 - **Hash Params for Token Passing:**
   - Why passing tokens through hash params (e.g., `#access_token=...`) is more secure than query params
   - Hash params are not sent to the server, reducing risk of token leakage via logs or referrer headers
@@ -180,6 +179,4 @@ Participants can either:
 
 - Discuss remaining challenges or questions
 - Collect feedback about the workshop
-- Suggest next steps for implementing WebView integrations in Vaillant :D
-
----
+- Suggest next steps for implementing WebView integrations
