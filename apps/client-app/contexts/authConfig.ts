@@ -35,6 +35,18 @@ const getKeycloakConfig = () => {
     };
   }
 
+  // Web platform configuration
+  if (Platform.OS === "web") {
+    return {
+      baseUrl: `http://plague.dev/idm`,
+      realm: "WorkshopRealm",
+      clientId: "client-app",
+      redirectUri: "http://localhost:8081/auth-callback", // Expo web runs on port 8081
+      authServerUrl: "http://localhost:4000",
+      tokenExchangeClientSecret: "yZpLi8GqtwwXYQebJuulZSC0Kb8IcDJJ", // Replace with actual secret
+    };
+  }
+
   return {
     baseUrl: `http://plague.dev/idm`,
     realm: "WorkshopRealm",

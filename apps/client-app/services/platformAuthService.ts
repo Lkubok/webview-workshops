@@ -161,7 +161,14 @@ export class PlatformAuthService {
    */
   private static buildWebAuthUrl(state: string): string {
     const baseUrl = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/auth`;
-    const redirectUri = encodeURIComponent(window.location.origin + '/auth-callback');
+    const redirectUri = KEYCLOAK_CONFIG.redirectUri;
+
+    console.log('Web auth URL configuration:', {
+      baseUrl,
+      redirectUri,
+      clientId: KEYCLOAK_CONFIG.clientId,
+      platform: 'web'
+    });
 
     const params = new URLSearchParams({
       client_id: KEYCLOAK_CONFIG.clientId,
@@ -171,7 +178,10 @@ export class PlatformAuthService {
       state: state,
     });
 
-    return `${baseUrl}?${params.toString()}`;
+    const fullUrl = `${baseUrl}?${params.toString()}`;
+    console.log('Full auth URL:', fullUrl);
+
+    return fullUrl;
   }
 
   /**
@@ -196,7 +206,7 @@ export class PlatformAuthService {
         throw new Error('Invalid state parameter - possible CSRF attack');
       }
 
-      const redirectUri = window.location.origin + '/auth-callback';
+      const redirectUri = KEYCLOAK_CONFIG.redirectUri;
 
       console.log('Processing web auth callback...');
       const tokens = await AuthService.exchangeCodeForTokens({
