@@ -14,8 +14,8 @@ export default [
     ],
     rules: {
       // Next.js specific adjustments
+      "@next/next/no-html-link-for-pages": "off",
       "react/no-unescaped-entities": "warn", // Warn instead of error for content
-      "@typescript-eslint/no-unused-vars": "warn", // Warn for unused vars instead of error
     },
   },
 ];

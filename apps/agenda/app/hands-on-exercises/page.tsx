@@ -255,7 +255,13 @@ export default function HandsOnExercises() {
                 text: "text-red-900",
                 badge: "bg-red-100 text-red-700"
               }
-            }[exercise.color];
+            }[exercise.color] || {
+              gradient: "from-slate-600 to-gray-600",
+              bg: "bg-slate-50",
+              border: "border-slate-200",
+              text: "text-slate-900",
+              badge: "bg-slate-100 text-slate-700"
+            };
 
             return (
               <motion.div

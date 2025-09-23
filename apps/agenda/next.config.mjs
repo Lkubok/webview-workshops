@@ -5,7 +5,6 @@ const nextConfig = {
     dirs: ['app', 'components', 'lib', 'types'],
   },
   typescript: {
-    // Only ignore specific build errors if needed, but report them
     ignoreBuildErrors: false,
   },
   images: {

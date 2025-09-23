@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+build
+dist
+*.tsbuildinfo
+
+# Cache directories
+.turbo
+.expo
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# Package manager files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+coverage
+.nyc_output

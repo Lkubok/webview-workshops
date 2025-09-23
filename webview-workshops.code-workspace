@@ -1,0 +1,106 @@
+{
+  "folders": [
+    {
+      "name": "Root",
+      "path": "."
+    },
+    {
+      "name": "📱 Client App",
+      "path": "./apps/client-app"
+    },
+    {
+      "name": "🌐 Server",
+      "path": "./apps/server"
+    },
+    {
+      "name": "📅 Agenda",
+      "path": "./apps/agenda"
+    },
+    {
+      "name": "📊 Device Dashboard",
+      "path": "./apps/device-dashboard"
+    },
+    {
+      "name": "🧩 UI Components",
+      "path": "./packages/ui"
+    },
+    {
+      "name": "⚙️ ESLint Config",
+      "path": "./packages/eslint-config"
+    },
+    {
+      "name": "🔧 TypeScript Config",
+      "path": "./packages/typescript-config"
+    }
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.suggest.autoImports": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "eslint.workingDirectories": [
+      {
+        "mode": "auto"
+      }
+    ],
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "eslint.format.enable": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescriptreact]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "files.associations": {
+      "*.css": "tailwindcss"
+    },
+    "emmet.includeLanguages": {
+      "postcss": "css"
+    },
+    "typescript.inlayHints.parameterNames.enabled": "all",
+    "typescript.inlayHints.variableTypes.enabled": true,
+    "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.next": true,
+      "**/build": true,
+      "**/out": true,
+      "**/.expo": true,
+      "**/.turbo": true
+    },
+    "files.watcherExclude": {
+      "**/node_modules/**": true,
+      "**/dist/**": true,
+      "**/.next/**": true,
+      "**/build/**": true,
+      "**/out/**": true,
+      "**/.expo/**": true,
+      "**/.turbo/**": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-vscode.vscode-typescript-next",
+      "bradlc.vscode-tailwindcss",
+      "yoavbls.pretty-ts-errors",
+      "ms-vscode.vscode-json",
+      "expo.vscode-expo-tools"
+    ],
+    "unwantedRecommendations": [
+      "ms-vscode.vscode-typescript"
+    ]
+  }
+}

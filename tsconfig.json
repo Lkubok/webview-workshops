@@ -1,0 +1,17 @@
+{
+  "extends": "./packages/typescript-config/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@repo/*": ["./packages/*/src"]
+    }
+  },
+  "include": [],
+  "exclude": ["node_modules", "dist", ".next", "out", "build"],
+  "references": [
+    { "path": "./packages/ui" },
+    { "path": "./apps/client-app" },
+    { "path": "./apps/agenda" },
+    { "path": "./apps/device-dashboard" }
+  ]
+}

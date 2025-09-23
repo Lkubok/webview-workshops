@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 function Tabs({
   className,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Root>) {
+}: React.ComponentProps<typeof TabsPrimitive.Root> & {
+  className?: string
+}) {
   return (
     <TabsPrimitive.Root
       data-slot="tabs"
@@ -21,7 +23,9 @@ function Tabs({
 function TabsList({
   className,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.List>) {
+}: React.ComponentProps<typeof TabsPrimitive.List> & {
+  className?: string
+}) {
   return (
     <TabsPrimitive.List
       data-slot="tabs-list"
@@ -37,7 +41,9 @@ function TabsList({
 function TabsTrigger({
   className,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
+}: React.ComponentProps<typeof TabsPrimitive.Trigger> & {
+  className?: string
+}) {
   return (
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
@@ -53,7 +59,9 @@ function TabsTrigger({
 function TabsContent({
   className,
   ...props
-}: React.ComponentProps<typeof TabsPrimitive.Content>) {
+}: React.ComponentProps<typeof TabsPrimitive.Content> & {
+  className?: string
+}) {
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"

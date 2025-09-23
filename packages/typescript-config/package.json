@@ -3,6 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
+  "exports": {
+    "./base": "./base.json",
+    "./nextjs": "./nextjs.json",
+    "./react-library": "./react-library.json"
+  },
+  "scripts": {
+    "build": "echo 'No build needed for config package'",
+    "lint": "echo 'No code to lint in config package'",
+    "check-types": "echo 'No TypeScript files to check'"
+  },
   "publishConfig": {
     "access": "public"
   }

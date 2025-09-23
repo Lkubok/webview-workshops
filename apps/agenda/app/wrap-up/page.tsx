@@ -244,7 +244,7 @@ export default function WrapUp() {
 
             <div className="grid gap-4">
               {nextSteps.map((step, index) => {
-                const priorityColors = {
+                const priorityColors: Record<string, string> = {
                   High: "bg-red-100 text-red-700 border-red-200",
                   Medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
                   Low: "bg-green-100 text-green-700 border-green-200"
@@ -255,7 +255,7 @@ export default function WrapUp() {
                     <div className="flex items-start justify-between mb-3">
                       <h4 className="font-semibold text-slate-800">{step.title}</h4>
                       <div className="flex gap-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${priorityColors[step.priority]}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium border ${priorityColors[step.priority] || "bg-slate-100 text-slate-700 border-slate-200"}`}>
                           {step.priority} Priority
                         </span>
                         <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
