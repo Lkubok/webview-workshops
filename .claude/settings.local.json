@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(curl:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npx expo prebuild:*)"
     ],
     "deny": [],
     "ask": []
