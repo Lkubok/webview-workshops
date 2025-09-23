@@ -13,7 +13,9 @@
       "Bash(pnpm tsc:*)",
       "Bash(pnpm install:*)",
       "Bash(pnpm list:*)",
-      "Bash(pnpm turbo check-types:*)"
+      "Bash(pnpm turbo check-types:*)",
+      "Bash(mv:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -38,10 +38,10 @@ export default function EmbeddedPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Loading...</p>
+          <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
+          <p className="text-muted-foreground mt-2">Loading...</p>
         </div>
       </div>
     );
@@ -56,10 +56,10 @@ export default function EmbeddedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="bg-background min-h-screen p-4">
+      <div className="mx-auto max-w-2xl">
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2 flex items-center justify-between">
             <Badge variant="secondary" className="text-xs">
               WebView Ready
             </Badge>
@@ -82,9 +82,9 @@ export default function EmbeddedPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
-              <div className="text-sm space-y-1">
+            <div className="bg-muted rounded-lg p-3">
+              <h3 className="mb-2 text-sm font-semibold">Authenticated User</h3>
+              <div className="space-y-1 text-sm">
                 <p>
                   <strong>Name:</strong> {session.user?.name || "Not provided"}
                 </p>
@@ -95,9 +95,9 @@ export default function EmbeddedPage() {
               </div>
             </div>
 
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">WebView Features</h3>
-              <ul className="text-sm space-y-1 list-disc list-inside">
+            <div className="bg-muted rounded-lg p-3">
+              <h3 className="mb-2 text-sm font-semibold">WebView Features</h3>
+              <ul className="list-inside list-disc space-y-1 text-sm">
                 <li>Responsive design for mobile screens</li>
                 <li>Touch-friendly interface elements</li>
                 <li>Minimal navigation for embedded context</li>
@@ -106,11 +106,11 @@ export default function EmbeddedPage() {
             </div>
 
             {hasDashboardRole && (
-              <div className="p-3 bg-muted rounded-lg">
-                <h3 className="font-semibold text-sm mb-2">
+              <div className="bg-muted rounded-lg p-3">
+                <h3 className="mb-2 text-sm font-semibold">
                   Dashboard user info
                 </h3>
-                <ul className="text-sm space-y-1 list-disc list-inside">
+                <ul className="list-inside list-disc space-y-1 text-sm">
                   <li>
                     {hasDashboardRole
                       ? "You have the dashboard-app-user role."
@@ -123,7 +123,7 @@ export default function EmbeddedPage() {
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            <div className="flex flex-col gap-2 pt-2 sm:flex-row">
               <Button
                 onClick={() => window.location.reload()}
                 variant="outline"
@@ -140,7 +140,7 @@ export default function EmbeddedPage() {
         </Card>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             This page is protected by Keycloak authentication and ready for
             WebView embedding
           </p>

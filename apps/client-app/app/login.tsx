@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, Alert } from "react-native";
-import { useAuth } from "../../contexts/AuthContext";
-import { Button } from "../../components";
-import { useConnectionTest } from "../../hooks";
-import { commonStyles, typography, spacing } from "../../styles/theme";
+import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../components";
+import { useConnectionTest } from "../hooks";
+import { commonStyles, typography, spacing } from "../styles/theme";
 
 export default function LoginScreen() {
   const { login } = useAuth();
@@ -29,7 +29,7 @@ export default function LoginScreen() {
   return (
     <View style={[commonStyles.container, commonStyles.center]}>
       <View style={commonStyles.content}>
-        <View style={{ alignItems: 'center', marginBottom: 60 }}>
+        <View style={{ alignItems: "center", marginBottom: 60 }}>
           <Text style={[typography.title, { marginBottom: spacing.sm }]}>
             Welcome
           </Text>
@@ -45,7 +45,13 @@ export default function LoginScreen() {
           style={{ marginBottom: spacing.xl }}
         />
 
-        <Text style={[typography.caption, commonStyles.textCenter, { lineHeight: 20, marginBottom: spacing.lg }]}>
+        <Text
+          style={[
+            typography.caption,
+            commonStyles.textCenter,
+            { lineHeight: 20, marginBottom: spacing.lg },
+          ]}
+        >
           You will be redirected to Keycloak to sign in securely.
         </Text>
 
