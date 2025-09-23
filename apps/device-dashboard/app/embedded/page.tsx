@@ -16,8 +16,10 @@ import { useHasRole } from "@/hooks/useRole";
 
 export default function EmbeddedPage() {
   const { data: session, status } = useSession();
+  console.log("NEXTJS access token");
   const accessToken = (session as typeof session & { accessToken?: string })
     ?.accessToken;
+  console.log(accessToken);
   const router = useRouter();
   const hasDashboardRole = useHasRole(
     accessToken,
@@ -25,7 +27,7 @@ export default function EmbeddedPage() {
     "dashboard-app-user"
   );
 
-  const [counter, setCounter] = useState(0);
+  console.log("Has dashboard role:", hasDashboardRole);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -34,21 +36,12 @@ export default function EmbeddedPage() {
     }
   }, [session, status, router]);
 
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {};
-  }, []);
-  const sendCounterUpdate = (newCounter: number) => {};
-  const incrementCounter = () => {
-    const newCounter = counter + 1;
-    setCounter(newCounter);
-  };
-
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-muted-foreground">Loading...</p>
+          <div className="border-primary mx-auto h-8 w-8 animate-spin rounded-full border-b-2"></div>
+          <p className="text-muted-foreground mt-2">Loading...</p>
         </div>
       </div>
     );
@@ -63,10 +56,10 @@ export default function EmbeddedPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="bg-background min-h-screen p-4">
+      <div className="mx-auto max-w-2xl">
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2 flex items-center justify-between">
             <Badge variant="secondary" className="text-xs">
               WebView Ready
             </Badge>
@@ -74,38 +67,24 @@ export default function EmbeddedPage() {
               ← Back
             </Button>
           </div>
-          <h1 className="text-2xl font-bold">
-            Exercise 1: Two-Way Communication
-          </h1>
+          <h1 className="text-2xl font-bold">Embedded Workshop View</h1>
           <p className="text-muted-foreground text-sm">
-            Counter controlled from React Native WebView
+            Optimized for React Native WebView display
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Counter Component</CardTitle>
+            <CardTitle className="text-lg">Workshop Content</CardTitle>
             <CardDescription>
-              This counter can be incremented from the React Native app
+              This page is designed to be embedded in a React Native WebView
+              component
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="text-center p-6 bg-muted rounded-lg">
-              <h2 className="text-3xl font-bold mb-2">Counter: {counter}</h2>
-              <p className="text-sm text-muted-foreground">
-                Use the button in the React Native app to increment this counter
-              </p>
-            </div>
-
-            <div className="flex justify-center">
-              <Button onClick={incrementCounter} variant="outline">
-                Local Increment (for testing)
-              </Button>
-            </div>
-
-            <div className="p-3 bg-muted rounded-lg">
-              <h3 className="font-semibold text-sm mb-2">Authenticated User</h3>
-              <div className="text-sm space-y-1">
+            <div className="bg-muted rounded-lg p-3">
+              <h3 className="mb-2 text-sm font-semibold">Authenticated User</h3>
+              <div className="space-y-1 text-sm">
                 <p>
                   <strong>Name:</strong> {session.user?.name || "Not provided"}
                 </p>
@@ -115,13 +94,55 @@ export default function EmbeddedPage() {
                 </p>
               </div>
             </div>
+
+            <div className="bg-muted rounded-lg p-3">
+              <h3 className="mb-2 text-sm font-semibold">WebView Features</h3>
+              <ul className="list-inside list-disc space-y-1 text-sm">
+                <li>Responsive design for mobile screens</li>
+                <li>Touch-friendly interface elements</li>
+                <li>Minimal navigation for embedded context</li>
+                <li>Authentication state preserved</li>
+              </ul>
+            </div>
+
+            {hasDashboardRole && (
+              <div className="bg-muted rounded-lg p-3">
+                <h3 className="mb-2 text-sm font-semibold">
+                  Dashboard user info
+                </h3>
+                <ul className="list-inside list-disc space-y-1 text-sm">
+                  <li>
+                    {hasDashboardRole
+                      ? "You have the dashboard-app-user role."
+                      : "You do NOT have the dashboard-app-user role."}
+                  </li>
+                  <li>
+                    This role allows access to specific dashboard features.
+                  </li>
+                </ul>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 pt-2 sm:flex-row">
+              <Button
+                onClick={() => window.location.reload()}
+                variant="outline"
+                size="sm"
+                className="flex-1"
+              >
+                Refresh Content
+              </Button>
+              <Button onClick={goBack} size="sm" className="flex-1">
+                Return to Dashboard
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-muted-foreground">
-            Exercise 1: Implement two-way communication between React Native and
-            Next.js
+          <p className="text-muted-foreground text-xs">
+            This page is protected by Keycloak authentication and ready for
+            WebView embedding
           </p>
         </div>
       </div>
