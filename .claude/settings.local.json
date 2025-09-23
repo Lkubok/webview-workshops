@@ -4,7 +4,10 @@
       "Bash(curl:*)",
       "Bash(node:*)",
       "Bash(npx create-expo-app:*)",
-      "Bash(npx expo prebuild:*)"
+      "Bash(npx expo prebuild:*)",
+      "Bash(npx expo run:android:*)",
+      "Bash(lsof:*)",
+      "Bash(npm start)"
     ],
     "deny": [],
     "ask": []

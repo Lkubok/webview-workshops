@@ -30,7 +30,7 @@ const getKeycloakConfig = () => {
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "com.anonymous.clientapp://auth-callback",
-      authServerUrl: "http://localhost:4000",
+      authServerUrl: "http://10.0.2.2:4000",
       tokenExchangeClientSecret: "yZpLi8GqtwwXYQebJuulZSC0Kb8IcDJJ", // Replace with actual secret
     };
   }
