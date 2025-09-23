@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev --turbopack --hostname device-dashboard.localhost --port 3010",
     "lint": "eslint .",
-    "check-types": "echo 'TypeScript checking temporarily disabled due to React 18/19 type conflicts'",
+    "check-types": "tsc --noEmit",
     "start": "next start"
   },
   "dependencies": {
