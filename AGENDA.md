@@ -44,18 +44,10 @@
 
 ---
 
-## 3. Token Management & PKCE (10 min) 9:40–9:50
-
-- Overview of PKCE authentication flow in mobile apps
-- How to exchange code for token in a mobile context
-- How to refresh tokens inside WebView
-- Demo of token lifecycle handling and best practices
-
----
-
-## 4. WebView Deep Dive & Communication Bridges (20 min) 9:50–10:10
+## 3. WebView Deep Dive & Communication Bridges (20 min) 9:40–10:00
 
 ### WebView Configuration & Best Practices (10 min)
+
 - **Essential WebView Props:**
   - `javaScriptEnabled`, `domStorageEnabled`, `thirdPartyCookiesEnabled`
   - `userAgent` customization for API compatibility
@@ -72,6 +64,7 @@
   - Memory management and WebView lifecycle
 
 ### Communication Bridges (10 min)
+
 - **React Native → WebView:**
   - Using `injectJavaScript()` for dynamic code execution
   - Passing data through URL parameters and hash
@@ -88,15 +81,17 @@
 
 ---
 
-## 5. Hands-on Coding Session (80 min) 10:10–11:30
+## 4. Hands-on Coding Session (90 min) 10:00–11:30
 
 ### Exercise Structure
 
 The workshop includes 5 progressive exercises located in the `exercises/` folder. Each exercise contains:
+
 - `mobile-app/`: React Native WebView components (initial + final versions)
 - `nextjs-page/`: Next.js page components (initial + final versions)
 
 Participants can either:
+
 - Start from `*-initial.tsx` files (with TODOs) and build solutions step-by-step
 - Reference `*-final.tsx` files for complete implementations
 - Switch to exercise-specific git branches (`exercise-1`, `exercise-2`, etc.) for working examples
@@ -143,9 +138,10 @@ Participants can either:
 
 ---
 
-## 6. Advanced WebView Topics & Troubleshooting (20 min) 11:30–11:50
+## 5. Advanced WebView Topics & Troubleshooting (20 min) 11:30–11:50
 
 ### Common Issues & Solutions
+
 - **Loading Problems:**
   - Network connectivity and timeout handling
   - Mixed content (HTTPS/HTTP) issues
@@ -164,6 +160,7 @@ Participants can either:
   - Network request monitoring
 
 ### Advanced Integration Patterns
+
 - **WebView Lifecycle Management:**
   - Proper mounting/unmounting
   - Background/foreground state handling
@@ -179,16 +176,10 @@ Participants can either:
 
 ---
 
-## 7. Wrap-Up & Discussion (40 min) 11:50–12:30
+## 6. Wrap-Up & Discussion (40 min) 11:50–12:30
 
 - Discuss remaining challenges or questions
 - Collect feedback about the workshop
 - Suggest next steps for implementing WebView integrations in Vaillant :D
 
 ---
-
-**Notes:**
-
-- Include short breaks as needed (e.g., 5–10 min after the introduction or halfway through coding)
-- Keep demos concise but interactive to engage participants
-- Prepare a small “starter repo” for hands-on coding to save time
