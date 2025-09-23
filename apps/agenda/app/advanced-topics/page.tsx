@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import {
   MessageSquare,
   Clock,
-  AlertTriangle,
   Zap,
   Smartphone,
   Globe,
@@ -13,32 +12,26 @@ import {
   Bug,
   Network,
   Eye,
-  FileImage,
-  Download,
   Layers,
-  RotateCcw,
-  Settings,
-  Shield,
-  Cpu
 } from "lucide-react";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6 }
+  transition: { duration: 0.6 },
 };
 
 const staggerContainer = {
   animate: {
     transition: {
-      staggerChildren: 0.1
-    }
-  }
+      staggerChildren: 0.1,
+    },
+  },
 };
 
 export default function AdvancedTopics() {
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="mx-auto max-w-6xl p-8">
       <motion.div
         initial="initial"
         animate="animate"
@@ -47,76 +40,90 @@ export default function AdvancedTopics() {
       >
         {/* Header */}
         <motion.div variants={fadeInUp} className="text-center">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-12 h-12 bg-gradient-to-r from-red-600 to-pink-600 rounded-xl flex items-center justify-center">
-              <MessageSquare className="w-6 h-6 text-white" />
+          <div className="mb-6 flex items-center justify-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r from-red-600 to-pink-600">
+              <MessageSquare className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-transparent">
+            <h1 className="bg-gradient-to-r from-red-600 to-pink-600 bg-clip-text text-4xl font-bold text-transparent">
               Advanced WebView Topics & Troubleshooting
             </h1>
           </div>
-          <div className="flex items-center justify-center gap-2 text-slate-600 mb-4">
-            <Clock className="w-5 h-5" />
+          <div className="mb-4 flex items-center justify-center gap-2 text-slate-600">
+            <Clock className="h-5 w-5" />
             <span className="font-medium">Duration: 20 minutes</span>
             <span className="text-slate-400">|</span>
             <span>11:30 AM - 11:50 AM</span>
           </div>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Master advanced WebView integration patterns, solve common issues, and implement
-            production-ready solutions with confidence.
+          <p className="mx-auto max-w-3xl text-xl leading-relaxed text-slate-600">
+            Master advanced WebView integration patterns, solve common issues,
+            and implement production-ready solutions with confidence.
           </p>
         </motion.div>
 
         {/* Common Issues */}
-        <motion.div variants={fadeInUp} className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-          <div className="flex items-center gap-3 mb-6">
-            <Bug className="w-6 h-6 text-orange-600" />
-            <h2 className="text-2xl font-bold text-slate-800">Common Issues & Solutions</h2>
+        <motion.div
+          variants={fadeInUp}
+          className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg"
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <Bug className="h-6 w-6 text-orange-600" />
+            <h2 className="text-2xl font-bold text-slate-800">
+              Common Issues & Solutions
+            </h2>
           </div>
 
           <div className="space-y-6">
             <div className="grid gap-6">
-              <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Network className="w-6 h-6 text-red-600" />
-                  <h3 className="text-xl font-bold text-red-900">Loading Problems</h3>
+              <div className="rounded-xl border border-red-200 bg-red-50 p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <Network className="h-6 w-6 text-red-600" />
+                  <h3 className="text-xl font-bold text-red-900">
+                    Loading Problems
+                  </h3>
                 </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-lg border border-red-200">
-                    <h4 className="font-semibold text-red-900 mb-2">Network Connectivity</h4>
-                    <p className="text-red-800 text-sm mb-3">
-                      Handle network timeouts and connection failures gracefully.
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border border-red-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-red-900">
+                      Network Connectivity
+                    </h4>
+                    <p className="mb-3 text-sm text-red-800">
+                      Handle network timeouts and connection failures
+                      gracefully.
                     </p>
-                    <div className="bg-red-100 p-3 rounded-lg">
+                    <div className="rounded-lg bg-red-100 p-3">
                       <pre className="text-xs text-red-800">
-{`onError={(error) => {
+                        {`onError={(error) => {
   showOfflineMessage()
   enableRetryButton()
 }}`}
                       </pre>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-red-200">
-                    <h4 className="font-semibold text-red-900 mb-2">Mixed Content</h4>
-                    <p className="text-red-800 text-sm mb-3">
+                  <div className="rounded-lg border border-red-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-red-900">
+                      Mixed Content
+                    </h4>
+                    <p className="mb-3 text-sm text-red-800">
                       Resolve HTTPS/HTTP content conflicts in production.
                     </p>
-                    <div className="bg-red-100 p-3 rounded-lg">
+                    <div className="rounded-lg bg-red-100 p-3">
                       <pre className="text-xs text-red-800">
-{`mixedContentMode='never'
+                        {`mixedContentMode='never'
 allowsInlineMediaPlayback
 mediaPlaybackRequiresUserAction`}
                       </pre>
                     </div>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-red-200">
-                    <h4 className="font-semibold text-red-900 mb-2">Domain Whitelist</h4>
-                    <p className="text-red-800 text-sm mb-3">
+                  <div className="rounded-lg border border-red-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-red-900">
+                      Domain Whitelist
+                    </h4>
+                    <p className="mb-3 text-sm text-red-800">
                       Configure proper URL validation and security policies.
                     </p>
-                    <div className="bg-red-100 p-3 rounded-lg">
+                    <div className="rounded-lg bg-red-100 p-3">
                       <pre className="text-xs text-red-800">
-{`originWhitelist={[
+                        {`originWhitelist={[
   'https://*.yourdomain.com',
   'https://api.example.com'
 ]}`}
@@ -126,40 +133,48 @@ mediaPlaybackRequiresUserAction`}
                 </div>
               </div>
 
-              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Zap className="w-6 h-6 text-yellow-600" />
-                  <h3 className="text-xl font-bold text-yellow-900">Performance Issues</h3>
+              <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <Zap className="h-6 w-6 text-yellow-600" />
+                  <h3 className="text-xl font-bold text-yellow-900">
+                    Performance Issues
+                  </h3>
                 </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                    <h4 className="font-semibold text-yellow-900 mb-2">Memory Leaks</h4>
-                    <p className="text-yellow-800 text-sm mb-3">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-yellow-900">
+                      Memory Leaks
+                    </h4>
+                    <p className="mb-3 text-sm text-yellow-800">
                       Implement proper cleanup and lifecycle management.
                     </p>
-                    <ul className="text-xs text-yellow-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-yellow-700">
                       <li>• Remove event listeners on unmount</li>
                       <li>• Clear timers and intervals</li>
                       <li>• Clean up WebView references</li>
                     </ul>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                    <h4 className="font-semibold text-yellow-900 mb-2">Large DOM Handling</h4>
-                    <p className="text-yellow-800 text-sm mb-3">
+                  <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-yellow-900">
+                      Large DOM Handling
+                    </h4>
+                    <p className="mb-3 text-sm text-yellow-800">
                       Optimize rendering for complex web applications.
                     </p>
-                    <ul className="text-xs text-yellow-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-yellow-700">
                       <li>• Implement virtual scrolling</li>
                       <li>• Use progressive loading</li>
                       <li>• Minimize DOM complexity</li>
                     </ul>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                    <h4 className="font-semibold text-yellow-900 mb-2">Image Optimization</h4>
-                    <p className="text-yellow-800 text-sm mb-3">
+                  <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-yellow-900">
+                      Image Optimization
+                    </h4>
+                    <p className="mb-3 text-sm text-yellow-800">
                       Reduce memory usage and improve load times.
                     </p>
-                    <ul className="text-xs text-yellow-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-yellow-700">
                       <li>• Implement lazy loading</li>
                       <li>• Compress images appropriately</li>
                       <li>• Use responsive images</li>
@@ -168,40 +183,48 @@ mediaPlaybackRequiresUserAction`}
                 </div>
               </div>
 
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Smartphone className="w-6 h-6 text-purple-600" />
-                  <h3 className="text-xl font-bold text-purple-900">Platform-Specific Challenges</h3>
+              <div className="rounded-xl border border-purple-200 bg-purple-50 p-6">
+                <div className="mb-4 flex items-center gap-2">
+                  <Smartphone className="h-6 w-6 text-purple-600" />
+                  <h3 className="text-xl font-bold text-purple-900">
+                    Platform-Specific Challenges
+                  </h3>
                 </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="bg-white p-4 rounded-lg border border-purple-200">
-                    <h4 className="font-semibold text-purple-900 mb-2">iOS vs Android</h4>
-                    <p className="text-purple-800 text-sm mb-3">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border border-purple-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-purple-900">
+                      iOS vs Android
+                    </h4>
+                    <p className="mb-3 text-sm text-purple-800">
                       Handle WebView behavior differences between platforms.
                     </p>
-                    <ul className="text-xs text-purple-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-purple-700">
                       <li>• Different JavaScript engines</li>
                       <li>• Varying cookie behavior</li>
                       <li>• Platform-specific props</li>
                     </ul>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-purple-200">
-                    <h4 className="font-semibold text-purple-900 mb-2">Keyboard Handling</h4>
-                    <p className="text-purple-800 text-sm mb-3">
+                  <div className="rounded-lg border border-purple-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-purple-900">
+                      Keyboard Handling
+                    </h4>
+                    <p className="mb-3 text-sm text-purple-800">
                       Manage viewport adjustments and input focus.
                     </p>
-                    <ul className="text-xs text-purple-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-purple-700">
                       <li>• Keyboard avoiding view</li>
                       <li>• Viewport meta tags</li>
                       <li>• Focus management</li>
                     </ul>
                   </div>
-                  <div className="bg-white p-4 rounded-lg border border-purple-200">
-                    <h4 className="font-semibold text-purple-900 mb-2">File Operations</h4>
-                    <p className="text-purple-800 text-sm mb-3">
+                  <div className="rounded-lg border border-purple-200 bg-white p-4">
+                    <h4 className="mb-2 font-semibold text-purple-900">
+                      File Operations
+                    </h4>
+                    <p className="mb-3 text-sm text-purple-800">
                       Handle upload and download limitations.
                     </p>
-                    <ul className="text-xs text-purple-700 space-y-1">
+                    <ul className="space-y-1 text-xs text-purple-700">
                       <li>• File picker integration</li>
                       <li>• Download management</li>
                       <li>• Permissions handling</li>
@@ -214,106 +237,142 @@ mediaPlaybackRequiresUserAction`}
         </motion.div>
 
         {/* Debugging Techniques */}
-        <motion.div variants={fadeInUp} className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-          <div className="flex items-center gap-3 mb-6">
-            <Eye className="w-6 h-6 text-blue-600" />
-            <h2 className="text-2xl font-bold text-slate-800">Debugging Techniques</h2>
+        <motion.div
+          variants={fadeInUp}
+          className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg"
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <Eye className="h-6 w-6 text-blue-600" />
+            <h2 className="text-2xl font-bold text-slate-800">
+              Debugging Techniques
+            </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Globe className="w-6 h-6 text-blue-600" />
-                <h4 className="font-semibold text-blue-900">Remote Debugging</h4>
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Globe className="h-6 w-6 text-blue-600" />
+                <h4 className="font-semibold text-blue-900">
+                  Remote Debugging
+                </h4>
               </div>
-              <p className="text-blue-800 text-sm mb-4">
+              <p className="mb-4 text-sm text-blue-800">
                 Use Chrome DevTools for WebView debugging and inspection.
               </p>
               <div className="space-y-2 text-xs text-blue-700">
-                <div className="bg-blue-100 p-2 rounded">chrome://inspect (Android)</div>
-                <div className="bg-blue-100 p-2 rounded">Safari Web Inspector (iOS)</div>
-                <div className="bg-blue-100 p-2 rounded">React Native Debugger</div>
+                <div className="rounded bg-blue-100 p-2">
+                  chrome://inspect (Android)
+                </div>
+                <div className="rounded bg-blue-100 p-2">
+                  Safari Web Inspector (iOS)
+                </div>
+                <div className="rounded bg-blue-100 p-2">
+                  React Native Debugger
+                </div>
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Bug className="w-6 h-6 text-green-600" />
-                <h4 className="font-semibold text-green-900">Console Logging</h4>
+            <div className="rounded-xl border border-green-200 bg-green-50 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Bug className="h-6 w-6 text-green-600" />
+                <h4 className="font-semibold text-green-900">
+                  Console Logging
+                </h4>
               </div>
-              <p className="text-green-800 text-sm mb-4">
+              <p className="mb-4 text-sm text-green-800">
                 Implement comprehensive logging for error tracking.
               </p>
-              <div className="bg-green-100 p-3 rounded-lg">
+              <div className="rounded-lg bg-green-100 p-3">
                 <pre className="text-xs text-green-800">
-{`console.log('WebView event:', data)
+                  {`console.log('WebView event:', data)
 console.error('WebView error:', error)
 console.time('WebView load')`}
                 </pre>
               </div>
             </div>
 
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-3">
-                <Network className="w-6 h-6 text-purple-600" />
-                <h4 className="font-semibold text-purple-900">Network Monitoring</h4>
+            <div className="rounded-xl border border-purple-200 bg-purple-50 p-6">
+              <div className="mb-3 flex items-center gap-2">
+                <Network className="h-6 w-6 text-purple-600" />
+                <h4 className="font-semibold text-purple-900">
+                  Network Monitoring
+                </h4>
               </div>
-              <p className="text-purple-800 text-sm mb-4">
+              <p className="mb-4 text-sm text-purple-800">
                 Track network requests and API communication.
               </p>
               <div className="space-y-2 text-xs text-purple-700">
-                <div className="bg-purple-100 p-2 rounded">Network tab in DevTools</div>
-                <div className="bg-purple-100 p-2 rounded">Flipper network inspector</div>
-                <div className="bg-purple-100 p-2 rounded">Custom logging middleware</div>
+                <div className="rounded bg-purple-100 p-2">
+                  Network tab in DevTools
+                </div>
+                <div className="rounded bg-purple-100 p-2">
+                  Flipper network inspector
+                </div>
+                <div className="rounded bg-purple-100 p-2">
+                  Custom logging middleware
+                </div>
               </div>
             </div>
           </div>
         </motion.div>
 
         {/* Advanced Integration Patterns */}
-        <motion.div variants={fadeInUp} className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-          <div className="flex items-center gap-3 mb-6">
-            <Layers className="w-6 h-6 text-indigo-600" />
-            <h2 className="text-2xl font-bold text-slate-800">Advanced Integration Patterns</h2>
+        <motion.div
+          variants={fadeInUp}
+          className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg"
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <Layers className="h-6 w-6 text-indigo-600" />
+            <h2 className="text-2xl font-bold text-slate-800">
+              Advanced Integration Patterns
+            </h2>
           </div>
 
           <div className="space-y-6">
-            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
-              <h3 className="font-semibold text-lg text-indigo-900 mb-4">WebView Lifecycle Management</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h4 className="font-semibold text-indigo-900 mb-2">Mounting/Unmounting</h4>
-                  <p className="text-indigo-800 text-sm mb-3">
+            <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-indigo-900">
+                WebView Lifecycle Management
+              </h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border border-indigo-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-indigo-900">
+                    Mounting/Unmounting
+                  </h4>
+                  <p className="mb-3 text-sm text-indigo-800">
                     Proper initialization and cleanup procedures.
                   </p>
-                  <div className="bg-indigo-100 p-2 rounded text-xs">
-                    <pre className="text-indigo-800 text-xs">
-{`useEffect(() => {
+                  <div className="rounded bg-indigo-100 p-2 text-xs">
+                    <pre className="text-xs text-indigo-800">
+                      {`useEffect(() => {
   // Setup WebView
   return cleanup
 }, [])`}
                     </pre>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h4 className="font-semibold text-indigo-900 mb-2">Background/Foreground</h4>
-                  <p className="text-indigo-800 text-sm mb-3">
+                <div className="rounded-lg border border-indigo-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-indigo-900">
+                    Background/Foreground
+                  </h4>
+                  <p className="mb-3 text-sm text-indigo-800">
                     Handle app state changes and WebView suspension.
                   </p>
-                  <div className="bg-indigo-100 p-2 rounded text-xs">
-                    <pre className="text-indigo-800 text-xs">
-{`AppState.addEventListener(
+                  <div className="rounded bg-indigo-100 p-2 text-xs">
+                    <pre className="text-xs text-indigo-800">
+                      {`AppState.addEventListener(
   'change', handleAppState
 )`}
                     </pre>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-indigo-200">
-                  <h4 className="font-semibold text-indigo-900 mb-2">Memory Cleanup</h4>
-                  <p className="text-indigo-800 text-sm mb-3">
+                <div className="rounded-lg border border-indigo-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-indigo-900">
+                    Memory Cleanup
+                  </h4>
+                  <p className="mb-3 text-sm text-indigo-800">
                     Implement comprehensive cleanup strategies.
                   </p>
-                  <ul className="text-xs text-indigo-700 space-y-1">
+                  <ul className="space-y-1 text-xs text-indigo-700">
                     <li>• Clear WebView cache</li>
                     <li>• Remove message listeners</li>
                     <li>• Cancel pending requests</li>
@@ -322,35 +381,41 @@ console.time('WebView load')`}
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-              <h3 className="font-semibold text-lg text-green-900 mb-4">Multi-WebView Architecture</h3>
-              <div className="grid md:grid-cols-2 gap-6">
+            <div className="rounded-xl border border-green-200 bg-green-50 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-green-900">
+                Multi-WebView Architecture
+              </h3>
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <h4 className="font-semibold text-green-900 mb-3">When to Use Multiple WebViews</h4>
-                  <ul className="text-green-800 text-sm space-y-2">
+                  <h4 className="mb-3 font-semibold text-green-900">
+                    When to Use Multiple WebViews
+                  </h4>
+                  <ul className="space-y-2 text-sm text-green-800">
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
                       <span>Independent authentication contexts</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
                       <span>Separate security domains</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
                       <span>Different performance requirements</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5" />
+                      <CheckCircle className="mt-0.5 h-4 w-4 text-green-600" />
                       <span>Isolated error boundaries</span>
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-green-900 mb-3">Shared State Management</h4>
-                  <div className="bg-white p-4 rounded-lg border border-green-200">
+                  <h4 className="mb-3 font-semibold text-green-900">
+                    Shared State Management
+                  </h4>
+                  <div className="rounded-lg border border-green-200 bg-white p-4">
                     <pre className="text-sm text-green-800">
-{`// Context provider for WebViews
+                      {`// Context provider for WebViews
 const WebViewContext = createContext()
 
 // Shared state hooks
@@ -363,34 +428,48 @@ const useWebViewState = () => {
               </div>
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-              <h3 className="font-semibold text-lg text-yellow-900 mb-4">Progressive Web App (PWA) Integration</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-900 mb-2">Service Worker Compatibility</h4>
-                  <p className="text-yellow-800 text-sm mb-3">
+            <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-yellow-900">
+                Progressive Web App (PWA) Integration
+              </h3>
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-yellow-900">
+                    Service Worker Compatibility
+                  </h4>
+                  <p className="mb-3 text-sm text-yellow-800">
                     Handle service worker registration and updates in WebView.
                   </p>
-                  <div className="bg-yellow-100 p-2 rounded text-xs">
-                    <span className="text-yellow-800">Check SW support in WebView</span>
+                  <div className="rounded bg-yellow-100 p-2 text-xs">
+                    <span className="text-yellow-800">
+                      Check SW support in WebView
+                    </span>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-900 mb-2">Offline Functionality</h4>
-                  <p className="text-yellow-800 text-sm mb-3">
+                <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-yellow-900">
+                    Offline Functionality
+                  </h4>
+                  <p className="mb-3 text-sm text-yellow-800">
                     Implement offline support and cache management.
                   </p>
-                  <div className="bg-yellow-100 p-2 rounded text-xs">
-                    <span className="text-yellow-800">Cache-first strategies</span>
+                  <div className="rounded bg-yellow-100 p-2 text-xs">
+                    <span className="text-yellow-800">
+                      Cache-first strategies
+                    </span>
                   </div>
                 </div>
-                <div className="bg-white p-4 rounded-lg border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-900 mb-2">App-like Behavior</h4>
-                  <p className="text-yellow-800 text-sm mb-3">
+                <div className="rounded-lg border border-yellow-200 bg-white p-4">
+                  <h4 className="mb-2 font-semibold text-yellow-900">
+                    App-like Behavior
+                  </h4>
+                  <p className="mb-3 text-sm text-yellow-800">
                     Create seamless native-web hybrid experiences.
                   </p>
-                  <div className="bg-yellow-100 p-2 rounded text-xs">
-                    <span className="text-yellow-800">Native navigation patterns</span>
+                  <div className="rounded bg-yellow-100 p-2 text-xs">
+                    <span className="text-yellow-800">
+                      Native navigation patterns
+                    </span>
                   </div>
                 </div>
               </div>
@@ -399,17 +478,23 @@ const useWebViewState = () => {
         </motion.div>
 
         {/* Next Steps */}
-        <motion.div variants={fadeInUp} className="bg-gradient-to-r from-red-600 to-pink-600 rounded-2xl p-8 text-white">
+        <motion.div
+          variants={fadeInUp}
+          className="rounded-2xl bg-gradient-to-r from-red-600 to-pink-600 p-8 text-white"
+        >
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Time to wrap up and discuss!</h2>
-              <p className="text-red-100 mb-4">
-                Let's consolidate your learning and discuss implementation strategies for your projects.
+              <h2 className="mb-2 text-2xl font-bold">
+                Time to wrap up and discuss!
+              </h2>
+              <p className="mb-4 text-red-100">
+                Let's consolidate your learning and discuss implementation
+                strategies for your projects.
               </p>
             </div>
-            <ArrowRight className="w-8 h-8 text-red-200" />
+            <ArrowRight className="h-8 w-8 text-red-200" />
           </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+          <div className="rounded-lg border border-white/20 bg-white/10 p-4 backdrop-blur-sm">
             <p className="text-sm text-red-100">
               <strong>Up Next:</strong> Wrap-Up & Discussion (40 minutes)
             </p>
