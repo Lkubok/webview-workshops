@@ -152,4 +152,38 @@ export class TokenService {
     }
     return null;
   }
+
+  /**
+   * Force clear all authentication data - useful for debugging or when tokens are corrupted
+   */
+  static async forceCleanup(): Promise<void> {
+    try {
+      console.log('Performing force cleanup of all authentication data...');
+
+      // Clear all token-related storage
+      await Promise.all([
+        StorageUtils.deleteItem(this.ACCESS_TOKEN_KEY),
+        StorageUtils.deleteItem(this.REFRESH_TOKEN_KEY),
+        StorageUtils.deleteItem(this.TOKEN_EXPIRY_KEY),
+        StorageUtils.deleteItem(this.AUTH_STATE_KEY),
+      ]);
+
+      // For web platform, also clear any localStorage items that might be related
+      if (Platform.OS === 'web') {
+        // Clear any potential session storage as well
+        try {
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.clear();
+          }
+        } catch (e) {
+          console.warn('Could not clear session storage:', e);
+        }
+      }
+
+      console.log('Force cleanup completed successfully');
+    } catch (error) {
+      console.error('Failed to perform force cleanup:', error);
+      throw new Error('Force cleanup failed');
+    }
+  }
 }

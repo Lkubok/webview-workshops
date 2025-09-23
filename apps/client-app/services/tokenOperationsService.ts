@@ -90,6 +90,15 @@ export class TokenOperationsService {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Token refresh failed:', errorData);
+
+        // If the refresh token is invalid, clear all stored tokens
+        if (response.status === 500 ||
+            (errorData.details && errorData.details.includes('invalid_grant')) ||
+            (errorData.details && errorData.details.includes('Token is not active'))) {
+          console.log('Refresh token is invalid, clearing stored tokens');
+          await TokenService.clearTokens();
+        }
+
         throw new Error(errorData.error || 'Token refresh failed');
       }
 

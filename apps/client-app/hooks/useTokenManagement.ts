@@ -43,9 +43,11 @@ export function useTokenManagement(
       console.error('Token refresh failed:', error);
       onTokenRefreshError?.(error instanceof Error ? error : new Error('Token refresh failed'));
 
-      // If refresh fails, user needs to login again
+      // Clear auth state when refresh fails (tokens are already cleared in TokenOperationsService)
       actions.clearAuthState();
-      throw error;
+
+      // Don't re-throw the error to prevent app crashes - let the auth state handle the logout
+      console.log('User will be redirected to login due to token refresh failure');
     }
   }, [actions.setTokens, actions.setUser, actions.clearAuthState, onTokenRefreshSuccess, onTokenRefreshError]);
 
@@ -78,13 +80,18 @@ export function useTokenManagement(
         }
 
         // Try to get user info with current token
-        const userInfo = await UserService.getUserInfo(accessToken);
+        try {
+          const userInfo = await UserService.getUserInfo(accessToken);
 
-        if (userInfo) {
-          actions.setUser(userInfo);
-          console.log('Restored authentication state from storage');
-        } else {
-          // Token might be invalid, try to refresh
+          if (userInfo) {
+            actions.setUser(userInfo);
+            console.log('Restored authentication state from storage');
+          } else {
+            // Token might be invalid, try to refresh
+            console.log('Failed to get user info, attempting token refresh...');
+            await refreshAccessToken();
+          }
+        } catch (userInfoError) {
           console.log('Failed to get user info, attempting token refresh...');
           await refreshAccessToken();
         }
@@ -96,7 +103,7 @@ export function useTokenManagement(
     } catch (error) {
       console.error('Failed to load stored authentication:', error);
       actions.clearAuthState();
-      // Don't throw here - this is initial load
+      // Don't throw here - this is initial load, gracefully fall back to unauthenticated state
     } finally {
       actions.setLoading(false);
     }

@@ -15,9 +15,10 @@ export class UserService {
     }
 
     try {
-      const userInfoEndpoint = `${KEYCLOAK_CONFIG.baseUrl}/realms/${KEYCLOAK_CONFIG.realm}/protocol/openid-connect/userinfo`;
+      // Use the proxy server instead of direct Keycloak access to avoid CORS issues
+      const userInfoEndpoint = `${KEYCLOAK_CONFIG.authServerUrl}/auth/userinfo`;
 
-      console.log('Fetching user info from:', userInfoEndpoint);
+      console.log('Fetching user info from proxy:', userInfoEndpoint);
 
       const response = await fetch(userInfoEndpoint, {
         method: 'GET',

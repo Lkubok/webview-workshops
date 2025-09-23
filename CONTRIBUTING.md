@@ -5,16 +5,18 @@
 ### Prerequisites
 
 - Node.js >= 18
-- pnpm >= 9.0.0
+- pnpm >= 10.0.0
 
 ### Getting Started
 
 1. Install dependencies:
+
    ```bash
    pnpm install
    ```
 
 2. Open VSCode with the workspace file:
+
    ```bash
    code webview-workshops.code-workspace
    ```
