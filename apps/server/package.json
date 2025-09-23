@@ -3,11 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "dist/index.js",
   "scripts": {
-    "dev": "node index.mjs",
-    "build": "echo 'Build not needed for pure JS server'",
-    "lint": "eslint .",
-    "check-types": "echo 'No TypeScript files to check'"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "check-types": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "postbuild": "echo 'Build completed successfully'"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -20,6 +25,11 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.15.3",
-    "eslint": "^9.34.0"
+    "eslint": "^9.34.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
