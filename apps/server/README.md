@@ -21,6 +21,7 @@ pnpm install
 # Copy environment variables
 cp .env.example .env
 # Edit .env with your Keycloak configuration
+# ⚠️ NEVER commit .env files to git!
 
 # Start development server
 pnpm dev
@@ -37,9 +38,11 @@ pnpm start
 
 ## Environment Variables
 
+🔐 **SECURITY**: All environment variables are excluded from git via `.gitignore`. Never commit `.env` files!
+
 - `KEYCLOAK_ISSUER`: Keycloak realm URL
 - `KEYCLOAK_CLIENT_ID`: OAuth2 client ID
-- `KEYCLOAK_CLIENT_SECRET`: OAuth2 client secret
+- `KEYCLOAK_CLIENT_SECRET`: OAuth2 client secret (keep secure, rotate regularly)
 - `PORT`: Server port (default: 4000)
 
 ## Docker Deployment

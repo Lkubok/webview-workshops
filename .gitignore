@@ -10,12 +10,10 @@ node_modules
 .yarn/install-state.gz
 .claude
 
-# Local env files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Local env files - ALL .env files should be ignored
+.env*
+!.env.example
+!.env.template
 
 # Testing
 coverage

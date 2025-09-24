@@ -13,6 +13,8 @@ A minimal Next.js 14 application demonstrating Keycloak authentication with thre
 
 ### 1. Environment Variables
 
+⚠️ **SECURITY IMPORTANT**: Never commit `.env*` files to git! They are excluded via `.gitignore`.
+
 Copy `.env.example` to `.env.local` and configure your Keycloak settings:
 
 \`\`\`bash
