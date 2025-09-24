@@ -47,9 +47,20 @@ router.post("/auth/refresh", async (req: Request, res: Response) => {
   } catch (err) {
     console.error("Token refresh error:", err);
     const errorMessage = err instanceof Error ? err.message : "Unknown error";
-    res
-      .status(500)
-      .json({ error: "Token refresh failed", details: errorMessage });
+
+    // Check if this is a refresh token expiration/invalid grant error
+    if (errorMessage.includes("invalid_grant") || errorMessage.includes("Token is not active")) {
+      res.status(401).json({
+        error: "Refresh token expired",
+        details: errorMessage,
+        requiresReauth: true
+      });
+    } else {
+      res.status(500).json({
+        error: "Token refresh failed",
+        details: errorMessage
+      });
+    }
   }
 });
 
