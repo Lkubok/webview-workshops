@@ -18,13 +18,13 @@ export default function IntroductionPage() {
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
             <h3 className="font-medium text-blue-900 mb-2">Quick Discussion</h3>
             <p className="text-blue-700">
-              "Who has worked with React Native WebView before?"
+              &quot;Who has worked with React Native WebView before?&quot;
             </p>
           </div>
 
           <p className="text-gray-700 leading-relaxed">
-            Welcome to today's React Native WebView Integration Workshop. Over the next 4 hours,
-            we'll dive deep into one of the most powerful but often misunderstood aspects of React Native development.
+            Welcome to today&apos;s React Native WebView Integration Workshop. Over the next 4 hours,
+            we&apos;ll dive deep into one of the most powerful but often misunderstood aspects of React Native development.
           </p>
         </section>
 

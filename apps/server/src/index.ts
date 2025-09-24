@@ -11,6 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Error handling middleware
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Internal server error' });

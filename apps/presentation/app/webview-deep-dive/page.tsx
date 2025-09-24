@@ -315,9 +315,9 @@ const ProductionWebView = () => {
           </h2>
 
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-            <h3 className="font-medium text-red-900 mb-3">Security in WebView isn't just about preventing attacks</h3>
+            <h3 className="font-medium text-red-900 mb-3">Security in WebView isn&apos;t just about preventing attacks</h3>
             <p className="text-red-700">
-              It's about building trust with your users and protecting your business. Every security measure
+              It&apos;s about building trust with your users and protecting your business. Every security measure
               should be implemented with both technical protection and user experience in mind.
             </p>
           </div>
@@ -387,7 +387,7 @@ const ProductionWebView = () => {
               <h3 className="font-medium text-red-900 mb-2">Memory Management</h3>
               <ul className="text-xs text-red-700 space-y-1">
                 <li>• Remove listeners on component unmount</li>
-                <li>• Don't hold strong WebView references</li>
+                <li>• Don&apos;t hold strong WebView references</li>
                 <li>• Monitor large DOM trees</li>
               </ul>
             </div>

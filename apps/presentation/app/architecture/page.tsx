@@ -205,7 +205,7 @@ const exchangeCodeForTokens = async (authCode) => {
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mt-4">
             <h3 className="font-medium text-yellow-900 mb-2">Token Exchange for WebView Integration</h3>
             <p className="text-sm text-yellow-700">
-              Configure different clients with different permission scopes, then use Keycloak's token exchange
+              Configure different clients with different permission scopes, then use Keycloak&apos;s token exchange
               feature to create limited-scope tokens specifically for WebView contexts.
             </p>
           </div>

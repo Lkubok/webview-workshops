@@ -738,7 +738,7 @@ const useWebViewDebugging = (webViewRef) => {
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">▶</span>
-                  <span><strong>Implement proper debugging:</strong> You'll need it when things go wrong</span>
+                  <span><strong>Implement proper debugging:</strong> You&apos;ll need it when things go wrong</span>
                 </li>
               </ul>
             </div>

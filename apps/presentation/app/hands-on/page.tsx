@@ -327,7 +327,7 @@ const TokenExchangeDemo = () => {
               Session Structure
             </h2>
             <p className="text-blue-700 mb-4">
-              Over the next 90 minutes, you'll build a complete WebView integration system from scratch,
+              Over the next 90 minutes, you&apos;ll build a complete WebView integration system from scratch,
               working through 5 progressive exercises that take you from basic setup to advanced authentication and state management.
             </p>
 
@@ -361,7 +361,7 @@ const TokenExchangeDemo = () => {
           <div className="space-y-6">
             {exercises.map((exercise) => {
               const IconComponent = exercise.icon
-              const colorClasses = {
+              const colorClasses: Record<string, string> = {
                 blue: 'from-blue-50 to-blue-100 border-blue-200',
                 green: 'from-green-50 to-green-100 border-green-200',
                 orange: 'from-orange-50 to-orange-100 border-orange-200',
@@ -508,7 +508,7 @@ const TokenExchangeDemo = () => {
 
           <div className="mt-6 p-4 bg-white rounded border border-green-300">
             <p className="text-green-800 font-medium">
-              🎉 You're now ready to build production WebView integrations!
+              🎉 You&apos;re now ready to build production WebView integrations!
             </p>
             <p className="text-sm text-green-700 mt-1">
               These patterns form the foundation for complex hybrid applications that combine the best of native and web technologies.
