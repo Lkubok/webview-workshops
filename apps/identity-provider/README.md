@@ -6,20 +6,10 @@ This directory contains the Keycloak identity provider setup using Docker Compos
 
 ⚠️ **IMPORTANT**: Default admin credentials are for development only!
 
-### Environment Configuration
-
-1. Copy the example environment file:
-```bash
-cp .env.example .env
-```
-
-2. Update the `.env` file with secure credentials:
-```env
-KEYCLOAK_ADMIN=admin
-KEYCLOAK_ADMIN_PASSWORD=your-secure-password-here  # Change this!
-```
+admin / admin
 
 🔐 **Security Notes**:
+
 - Never use default passwords in production
 - Environment files are excluded from git via `.gitignore`
 - Use strong, unique passwords for admin accounts
@@ -41,4 +31,3 @@ docker-compose down
 ## Access
 
 - **Admin Console**: http://localhost:8080/admin
-- **Admin Credentials**: Set via environment variables (.env file)
