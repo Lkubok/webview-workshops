@@ -39,7 +39,7 @@ From the root directory, you can run:
 ├── apps/
 │   ├── client-app/     # React Native/Expo mobile app
 │   ├── server/         # Express.js API server
-│   ├── agenda/         # Next.js workshop agenda app
+│   ├── presentation/   # Next.js workshop agenda app
 │   └── device-dashboard/ # Next.js device management dashboard
 ├── packages/
 │   ├── ui/             # Shared React components
