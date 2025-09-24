@@ -12,7 +12,6 @@
     { "path": "./packages/ui" },
     { "path": "./apps/client-app" },
     { "path": "./apps/device-dashboard" },
-    { "path": "./apps/identity-provider" },
     { "path": "./apps/presentation" },
     { "path": "./apps/server" }
   ]
