@@ -41,9 +41,22 @@ export function useTokenManagement(
 
     } catch (error) {
       console.error('Token refresh failed:', error);
-      onTokenRefreshError?.(error instanceof Error ? error : new Error('Token refresh failed'));
+      const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
 
-      // Clear auth state when refresh fails (tokens are already cleared in TokenOperationsService)
+      // Check if this is a refresh token expiration error
+      const isRefreshTokenExpired = errorMessage.includes('Refresh token expired') ||
+                                   errorMessage.includes('invalid_grant') ||
+                                   errorMessage.includes('Token is not active');
+
+      if (isRefreshTokenExpired) {
+        console.log('Refresh token has expired, user needs to re-authenticate');
+        // Clear all stored tokens since they're no longer valid
+        await TokenService.clearTokens();
+      }
+
+      onTokenRefreshError?.(error instanceof Error ? error : new Error(errorMessage));
+
+      // Clear auth state when refresh fails
       actions.clearAuthState();
 
       // Don't re-throw the error to prevent app crashes - let the auth state handle the logout
@@ -68,16 +81,18 @@ export function useTokenManagement(
       const { accessToken, refreshToken } = storedTokens;
 
       if (accessToken && refreshToken) {
-        actions.setTokens(accessToken, refreshToken);
-
-        // Check if token is expired
+        // Check if token is expired before setting state
         const isExpired = await TokenService.isTokenExpired();
 
         if (isExpired) {
           console.log('Stored token is expired, attempting refresh...');
+          // Don't set tokens in state yet - wait for refresh to succeed
           await refreshAccessToken();
           return;
         }
+
+        // Token appears valid, set it in state
+        actions.setTokens(accessToken, refreshToken);
 
         // Try to get user info with current token
         try {
@@ -95,6 +110,10 @@ export function useTokenManagement(
           console.log('Failed to get user info, attempting token refresh...');
           await refreshAccessToken();
         }
+      } else if (refreshToken && !accessToken) {
+        // We have refresh token but no access token - try to refresh
+        console.log('Found refresh token without access token, attempting refresh...');
+        await refreshAccessToken();
       } else {
         console.log('No stored authentication found');
         actions.clearAuthState();
