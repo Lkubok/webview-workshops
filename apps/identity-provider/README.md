@@ -31,3 +31,12 @@ docker-compose down
 ## Access
 
 - **Admin Console**: http://localhost:8080/admin
+
+## remote idm
+
+export config:
+
+sudo systemctl stop keycloak
+sudo -u keycloak /opt/keycloak/bin/kc.sh export --dir /tmp/keycloak-export --realm YOUR_REALM_NAME sudo systemctl start keycloak
+docker cp realm-export.json keycloak:/tmp/
+docker cp ./WorkshopRealmExport/WorkshopRealm-realm.json identity-provider-keycloak-1:/tmp/

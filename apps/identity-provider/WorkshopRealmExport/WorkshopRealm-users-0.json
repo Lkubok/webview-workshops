@@ -1,0 +1,115 @@
+{
+  "realm" : "WorkshopRealm",
+  "users" : [ {
+    "id" : "ba1c7820-ad74-4f4c-97d5-053b18ef75da",
+    "username" : "adminuser",
+    "firstName" : "Admin",
+    "lastName" : "User",
+    "email" : "admin@example.com",
+    "emailVerified" : true,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "8f8eb6bf-878d-4cca-b32b-4c4d656f446d",
+      "type" : "password",
+      "createdDate" : 1758211876122,
+      "secretData" : "{\"value\":\"84ygwt/Ew/phdSfSWdBpUBwyTWaFS3/I06uahMaffsbVEhIzdoHCmcovvc1SUmZ+6Wlse9ENisrDJzOnlvW1BA==\",\"salt\":\"kQ4+vdSyQXw1KYNbhACuxw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "admin" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "1fe8232b-dfc3-4df9-a2a2-35bbb1a64096",
+    "username" : "client1",
+    "firstName" : "client1",
+    "lastName" : "surname1",
+    "email" : "client1@test.com",
+    "emailVerified" : true,
+    "enabled" : true,
+    "createdTimestamp" : 1758369340039,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "bee4995f-4f89-488d-adc4-b3114120121e",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1758369861053,
+      "secretData" : "{\"value\":\"i0nskX7Lv4Dmuw3VQ56DMhXlrk+uXVK1t9umS1of6Wk=\",\"salt\":\"Xx+jHs7hsD/8ixySFhM2YA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "clientRoles" : {
+      "client-app" : [ "client-app-user" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "5f0033b8-19d8-498a-a514-4444c9397961",
+    "username" : "dashboard1",
+    "firstName" : "dashboard1",
+    "lastName" : "surname1",
+    "email" : "dashboard1@test.com",
+    "emailVerified" : true,
+    "enabled" : true,
+    "createdTimestamp" : 1758369496740,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "4a902e05-db6a-4f64-8af4-b4abbf80e2fa",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1758369846150,
+      "secretData" : "{\"value\":\"6BxjUf7zy2sporLB9RIdUEBMXMgVgjsw0tqBtZ//E3c=\",\"salt\":\"SbBywrREd1jAbDSPdr2vlw==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "clientRoles" : {
+      "device-dashboard" : [ "dashboard-app-user" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ "/DashboardUSers" ]
+  }, {
+    "id" : "94e57933-a1ee-4516-ab09-b1c85fb51f28",
+    "username" : "service-account-device-dashboard",
+    "emailVerified" : false,
+    "enabled" : true,
+    "createdTimestamp" : 1758372283023,
+    "totp" : false,
+    "serviceAccountClientId" : "device-dashboard",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-workshoprealm" ],
+    "clientRoles" : {
+      "realm-management" : [ "manage-realm" ],
+      "device-dashboard" : [ "uma_protection" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "1b4a57c2-3fe6-4d2d-b2ee-2aedec8d7355",
+    "username" : "service-account-token-exchange-service",
+    "emailVerified" : true,
+    "enabled" : true,
+    "createdTimestamp" : 1758532209474,
+    "totp" : false,
+    "serviceAccountClientId" : "token-exchange-service",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "token-exchange", "default-roles-workshoprealm", "admin", "uma_authorization", "user", "offline_access" ],
+    "clientRoles" : {
+      "realm-management" : [ "view-authorization", "view-users", "realm-admin", "manage-events", "create-client", "query-clients", "manage-identity-providers", "view-clients", "query-users", "manage-authorization", "view-realm", "impersonation", "view-events", "query-realms", "view-identity-providers", "query-groups", "manage-realm", "manage-users", "manage-clients" ],
+      "device-dashboard" : [ "dashboard-app-user", "uma_protection" ],
+      "client-app" : [ "client-app-user" ],
+      "broker" : [ "read-token" ],
+      "token-exchange-service" : [ "uma_protection" ],
+      "account" : [ "view-groups", "manage-consent", "view-profile", "delete-account", "view-applications", "view-consent", "manage-account", "manage-account-links" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}
