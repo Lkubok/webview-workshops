@@ -41,6 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loadStoredAuth();
   }, [loadStoredAuth]);
 
+  // Listen for custom auth token events on web
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    const handleAuthTokenStored = () => {
+      console.log('Auth tokens stored event received, reloading auth state...');
+      setTimeout(() => loadStoredAuth(), 100);
+    };
+
+    window.addEventListener('authTokensStored', handleAuthTokenStored);
+    return () => window.removeEventListener('authTokensStored', handleAuthTokenStored);
+  }, [loadStoredAuth]);
+
   // Provide authentication context (memoized to prevent unnecessary re-renders)
   const contextValue = useMemo<AuthContextType>(() => ({
     user: authState.user,

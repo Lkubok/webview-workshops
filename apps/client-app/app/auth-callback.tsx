@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "../contexts/AuthContext";
 import { Platform } from "react-native";
+import StorageUtils from "../contexts/StorageUtils";
 
 export default function AuthCallbackScreen() {
   const router = useRouter();
@@ -33,15 +34,17 @@ export default function AuthCallbackScreen() {
           return;
         }
 
-        const storedState = localStorage.getItem("auth_state");
+        const storedState = await StorageUtils.getItem("auth_state");
         if (storedState && state !== storedState) {
           setError("Invalid state parameter");
           setTimeout(() => router.replace("/login"), 3000);
           return;
         }
         await exchangeCodeForTokens(code);
-        localStorage.removeItem("auth_state");
-        router.replace("/");
+        await StorageUtils.deleteItem("auth_state");
+
+        // Wait a brief moment for the auth context to pick up the stored tokens
+        setTimeout(() => router.replace("/"), 200);
       } else {
         router.replace("/login");
       }
@@ -78,13 +81,19 @@ export default function AuthCallbackScreen() {
 
     const tokens = await response.json();
 
-    localStorage.setItem("access_token", tokens.access_token);
+    // Use the same storage mechanism as the rest of the app
+    await StorageUtils.setItem("access_token", tokens.access_token);
     if (tokens.refresh_token) {
-      localStorage.setItem("refresh_token", tokens.refresh_token);
+      await StorageUtils.setItem("refresh_token", tokens.refresh_token);
     }
     if (tokens.expires_in) {
       const expiryTime = Date.now() + tokens.expires_in * 1000;
-      localStorage.setItem("token_expiry", expiryTime.toString());
+      await StorageUtils.setItem("token_expiry", expiryTime.toString());
+    }
+
+    // Notify the auth context that tokens have been stored
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('authTokensStored'));
     }
   };
 
