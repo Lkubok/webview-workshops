@@ -2,9 +2,7 @@ import { config as nextJsConfig } from "../../packages/eslint-config/next.js";
 
 /** @type {import("eslint").Linter.Config[]} */
 export default [
-  ...nextJsConfig,
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
     ignores: [
       "node_modules/**",
       ".next/**",
@@ -12,6 +10,10 @@ export default [
       "build/**",
       "next-env.d.ts",
     ],
+  },
+  ...nextJsConfig,
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
     rules: {
       // Next.js specific adjustments
       "@next/next/no-html-link-for-pages": "off",
