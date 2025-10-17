@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 const getKeycloakConfig = () => {
   if (Platform.OS === "ios") {
     return {
-      baseUrl: `http://plague.dev/idm`,
+      baseUrl: `https://idm.plague.dev`,
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "com.anonymous.clientapp://auth-callback", // Always use native scheme for expo-prebuild
@@ -15,7 +15,7 @@ const getKeycloakConfig = () => {
   // For Android Emulator in development, use 10.0.2.2
   if (Platform.OS === "android" && __DEV__) {
     return {
-      baseUrl: `http://plague.dev/idm`,
+      baseUrl: `https://idm.plague.dev`,
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "com.anonymous.clientapp://auth-callback", // Always use native scheme for expo-prebuild
@@ -26,7 +26,7 @@ const getKeycloakConfig = () => {
 
   if (Platform.OS === "android") {
     return {
-      baseUrl: `http://plague.dev/idm`,
+      baseUrl: `https://idm.plague.dev`,
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "com.anonymous.clientapp://auth-callback",
@@ -38,7 +38,7 @@ const getKeycloakConfig = () => {
   // Web platform configuration
   if (Platform.OS === "web") {
     return {
-      baseUrl: `http://plague.dev/idm`,
+      baseUrl: `https://idm.plague.dev`,
       realm: "WorkshopRealm",
       clientId: "client-app",
       redirectUri: "http://localhost:8081/auth-callback", // Expo web runs on port 8081
@@ -48,7 +48,7 @@ const getKeycloakConfig = () => {
   }
 
   return {
-    baseUrl: `http://plague.dev/idm`,
+    baseUrl: `https://idm.plague.dev`,
     realm: "WorkshopRealm",
     clientId: "client-app",
     redirectUri: "exp://192.168.233.174:8081",
